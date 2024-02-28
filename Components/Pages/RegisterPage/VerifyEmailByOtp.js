@@ -4,8 +4,8 @@ import { Button } from 'react-native-elements';
 import axios from 'axios';
 import http from '../../../http';
 
-const InputOtp = ({ route, navigation }) => {
-    const { email } = route.params;
+const VerifyEmailByOtp = ({route, navigation}) => {
+    const {userInformation} = route.params
     const inputRefs = Array(6).fill(0).map(() => useRef(null));
     const [otp, setOtp] = useState(Array(6).fill(''));
     const [timer, setTimer] = useState(9)
@@ -14,80 +14,71 @@ const InputOtp = ({ route, navigation }) => {
     const [invalidOtp, setInvalidOtp] = useState(false)
 
     const handleInput = (index, value) => {
-    // Move to the next input if a character is entered
-    if (value.length === 1) {
-        if (index < 6    - 1 && inputRefs[index + 1].current) {
-          inputRefs[index + 1].current.focus();
-        }
-      } else if (value.length <= 1) {
-        // Move to the previous input if the character is deleted or blank
-        if (index > 0 && inputRefs[index - 1].current) {
-          inputRefs[index - 1].current.focus();
-        }
-      }
-  };
-
-  // FOr 10 seconds Countdown
-  useEffect(()=>{
-    if(startTimer == true){
-    const countdown = setInterval(()=>{  
-    setTimer(timer - 1)
-    if(timer < 2){clearInterval(countdown)}
-    }, 1000)
-    return ()=>{clearInterval(countdown)}      
-    }        
-    }, [startTimer, timer])
-
-    useEffect(()=>{
-        if(timer <1){
-        setStartTimer(false)
-        setTimer(10)
-        }
-    }, [timer])
-
-    const sendOtp = async () => {
-        try {
-            const result = await http.post("forgotPassword", {email})
-            conso
-            if(result.data.message === "Found")
-            {
-                navigation.navigate('InputOtp', {
-                    email
-                })
+        // Move to the next input if a character is entered
+        if (value.length === 1) {
+            if (index < 6    - 1 && inputRefs[index + 1].current) {
+              inputRefs[index + 1].current.focus();
             }
-            else
-            {
-                setInvalidOtp(true)
+          } else if (value.length <= 1) {
+            // Move to the previous input if the character is deleted or blank
+            if (index > 0 && inputRefs[index - 1].current) {
+              inputRefs[index - 1].current.focus();
             }
-        } catch (error) {
-            console.log(error)
-        } finally {
+          }
+      };
+    
+      // FOr 10 seconds Countdown
+      useEffect(()=>{
+        if(startTimer == true){
+        const countdown = setInterval(()=>{  
+        setTimer(timer - 1)
+        if(timer < 2){clearInterval(countdown)}
+        }, 1000)
+        return ()=>{clearInterval(countdown)}      
+        }        
+        }, [startTimer, timer])
+    
+        useEffect(()=>{
+            if(timer <1){
+            setStartTimer(false)
+            setTimer(10)
+            }
+        }, [timer])
+    
+        const sendOtp = async () => {
             setStartTimer(true)
-        }
-    }
-
-     // Submit Code for new Password
-     const submitCode = async () => {
-        setIsLoading(true)
-        if(otp != "")
-        {
             try {
-                const result = await http.post("forgotPassword/sendOtp", {code : otp.join(''), email})
-                if(result.data.status === 'verified')
-                {
-                    navigation.navigate('NewPassword', {
-                        email
-                    })
-                }
+                const result = await http.post('verifyEmail', {email : userInformation.email})            
             } catch (error) {
                 console.log(error)
-            } finally {
-                setIsLoading(false)
+            }
+        }
+    
+         // Submit Code for new Password
+         const submitCode = async () => {
+            const {username, email, password, firstname, lastname, contact, birthDate} = userInformation
+            setIsLoading(true)
+            if(otp != "")
+            {
+                try {
+                    const result = await http.post("verifyOTP", {otp : otp.join('')})
+                    if(result.data.status === "verified")
+                    {   
+                        await http.post("register", {username, email, password, firstname, lastname, contact, birthDate})
+                        navigation.navigate('Login')
+                    }
+                    else{
+                        setInvalidOtp(true)
+                    }
+                } catch (error) {
+                    console.log(error)
+                } finally {
+                    setIsLoading(false)
+                }
+                
             }
             
         }
-        
-    }
 
 
   return (
@@ -96,7 +87,7 @@ const InputOtp = ({ route, navigation }) => {
             <View  className="w-[100%]  p-2 mx-auto flex flex-col items-center">
             <Text className="text-2xl font-semibold">Enter OTP</Text>
             <Text className="text-base">We've sent a verification code to your email </Text>
-            <Text className="text-base">{email}</Text>
+            <Text className="text-base">{userInformation.email}</Text>
             </View>
             <View  className={`w-[100%] bg-red-100 p-2 mx-auto ${invalidOtp ? "flex" : "hidden"} flex-col items-center`}>
             <Text className="text-base text-red-500">Invalid OTP</Text>
@@ -135,4 +126,4 @@ const InputOtp = ({ route, navigation }) => {
   )
 }
 
-export default InputOtp
+export default VerifyEmailByOtp

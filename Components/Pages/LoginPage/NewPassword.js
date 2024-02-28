@@ -18,13 +18,14 @@ const NewPassword = ({ route, navigation }) => {
         }
         try {
             const result = await http.post("forgotPassword/newPassword", {email, password})
-            console.log(result.data)
+            console.log(result.data.status === "updated")
+            {
+              navigation.navigate('Login')
+            }
         } catch (error) {
             console.log(error)
         }
     }
-
-    console.log(email)
   return (
     <View className="w-full h-full bg-white py-10">
       <View className="w-[90%] mx-auto flex justify-center items-center">

@@ -16,7 +16,7 @@ const ForgotPassword = (props) => {
     const sendOtp = async () => {
         setLoading(true)
         try {
-            const result = await axios.post("https://kanoah.onrender.com/api/forgotPassword", {email})
+            const result = await http.post("forgotPassword", {email})
             if(result.data.message === "Found")
             {
                 navigation.navigate('InputOtp', {

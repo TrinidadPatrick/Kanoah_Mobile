@@ -17,8 +17,13 @@ const FillInfo = ({route, navigation}) => {
         firstname: "",
         lastname : "",
         contact : "",
-        birthDate : {}
+        birthDate : {
+            month : new Date().toLocaleString('en-US', { month : 'long'}),
+            day : new Date().toLocaleString('en-US', { day : 'numeric'}),
+            year : new Date().toLocaleString('en-US', { year : 'numeric'})
+        }
     })
+    const [emailExist, setEmailExist] = useState(false)
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate;
@@ -46,7 +51,13 @@ const FillInfo = ({route, navigation}) => {
       const verifyEmail = async () => {
         try {
             const result = await http.post('verifyEmail', {email : userInformation.email})
-            console.log(result.data)
+            if(result.data.status === "EmailExist")
+            {
+                setEmailExist(true)
+            }
+            else{
+                navigation.navigate('VerifyEmailByOtp', {userInformation})
+            }
         } catch (error) {
             console.log(error)
         }
@@ -94,9 +105,10 @@ const FillInfo = ({route, navigation}) => {
             </View>
 
             {/* Email */}
-            <View style={{borderBottomWidth : 1, columnGap : 5}} className="w-full border-gray-500 flex flex-row items-center relative">
+            <View style={{borderBottomWidth : 1, columnGap : 5}} className={`w-full ${emailExist ? "border-red-500" : "border-gray-500"}  flex flex-row items-center relative`}>
             <FontAwesome name='envelope' size={20} color="gray"/>
             <TextInput value={userInformation.email} onChangeText={(text) => setUserInformation({...userInformation, email : text})} placeholder='Email'  className=" w-full text-base p-2" />
+            <Text className={`absolute ${emailExist ? "" : "hidden"} -bottom-4 text-red-500 text-xs`}>Email already in use</Text>
             </View>
             
             <View className="w-full relative">

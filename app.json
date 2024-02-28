@@ -2,9 +2,9 @@
   "expo": {
     "name": "Kanoah_Mobile",
     "slug": "Kanoah_Mobile",
-    "version": "1.0.0",
+    "version": "1.1.2",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Kanoah.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -35,6 +35,13 @@
       "eas": {
         "projectId": "8240bedb-e869-4793-ac50-bd85459fb94a"
       }
+    },
+    "runtimeVersion": {
+      "policy": "1.1.2"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/8240bedb-e869-4793-ac50-bd85459fb94a",
+      "channel": "production"
     }
   }
 }

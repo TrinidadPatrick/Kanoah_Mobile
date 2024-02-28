@@ -17,10 +17,10 @@ const Login = (props) => {
     const [isLoading, setIsLoading] = useState(false)
 
   const signin = async () => {
-    
     setIsLoading(true)
     try {
         const result = await http.post(`loginMobile`, userInfos)
+        console.log(result.data)
         if(result.data.status === "authenticated"){
             await SecureStore.setItemAsync('accessToken', result.data.accessToken)
             navigation.navigate('Home')
