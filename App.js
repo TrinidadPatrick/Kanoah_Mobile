@@ -26,6 +26,7 @@ export default function App() {
   registerNNPushToken(19825, 'bY9Ipmkm8sFKbmXf7T0zNN');
 
 
+
   // Components for home
   const HomeStackScreen = () => (
     <Tab.Navigator>

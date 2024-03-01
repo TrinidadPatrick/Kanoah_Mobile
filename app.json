@@ -2,10 +2,9 @@
   "expo": {
     "name": "Kanoah_Mobile",
     "slug": "Kanoah_Mobile",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "orientation": "portrait",
-    "icon": "./assets/Kanoah.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -16,32 +15,25 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "Kanoah"
+      "bundleIdentifier": "com.example.mynewapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.patrick019.Kanoah_Mobile"
+      "package": "com.example.mynewapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-secure-store"
-    ],
     "extra": {
       "eas": {
-        "projectId": "8240bedb-e869-4793-ac50-bd85459fb94a"
+        "projectId": "36105a23-262d-4b13-9cc9-f0145ab91bb5"
       }
     },
     "runtimeVersion": {
-      "policy": "1.1.2"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/8240bedb-e869-4793-ac50-bd85459fb94a",
-      "channel": "production"
-    }
+        "policy": "sdkVersion"
+      }
   }
 }

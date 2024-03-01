@@ -1,7 +1,7 @@
 import { View, Text, FlatList, ScrollView } from 'react-native'
 import React from 'react'
 import useServices from '../../CustomHooks/AllServiceProvider'
-import {StarRatingDisplay} from 'react-native-star-rating-widget';
+import { Rating } from '@kolking/react-native-rating';
 import { Image } from 'react-native-elements'
 
 const HomeServiceList = ({services}) => {
@@ -18,7 +18,7 @@ const HomeServiceList = ({services}) => {
                 {/* Service Title */}
                 <Text numberOfLines={1} className="relative text-gray-800 font-medium">{service.basicInformation.ServiceTitle}</Text>
                 <View className="flex flex-row items-center mt-1 gap-2">
-                <StarRatingDisplay  style={{width : 80, display : 'flex', justifyContent : 'space-evenly'}} color="#ffa534" maxStars={5} starSize={17} rating={service.ratings} />
+                <Rating size={15} baseColor='#f2f2f2' rating={Number(service.ratings)} spacing={5} disabled />
                 <Text className="text-gray-400 text-xs">{service.ratings} ({service.totalReviews})</Text>
                 </View>
                 <View>

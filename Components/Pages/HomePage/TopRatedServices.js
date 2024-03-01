@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableHighlight } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native';
-import {StarRatingDisplay} from 'react-native-star-rating-widget';
+import { Rating } from '@kolking/react-native-rating';
 import { Image } from 'react-native-elements';
 import { Skeleton } from '@rneui/themed';
 
@@ -9,6 +9,7 @@ import { Skeleton } from '@rneui/themed';
   // const {services, getServices} = useServices()
   const [topRated, setTopRated] = useState(null)
   const [loading, setLoading] = useState(false)
+
   
   useEffect(()=>{
     if(services === null)
@@ -21,6 +22,7 @@ import { Skeleton } from '@rneui/themed';
   },[services])
 
 
+  // console.log(services[0].ratings)
   return (
     <View className="w-full h-[220px] flex bg-white rounded-md shadow-sm p-2 ">
 
@@ -71,15 +73,15 @@ import { Skeleton } from '@rneui/themed';
       </TouchableOpacity>
       </View>
 
-      <ScrollView showsHorizontalScrollIndicator={false} contentContainerStyle={{flexGrow : 1, justifyContent : 'center', alignItems : 'center', columnGap : 15}} horizontal={true} className={`p-2` }>
+      <ScrollView showsHorizontalScrollIndicator={false} contentContainerStyle={{flexGrow : 1, justifyContent : 'center', alignItems : 'center', columnGap : 15}} horizontal={true} className={`p-2 ${loading ? "hidden" : ""}` }>
         {
-          services?.map((service) => {
+          services?.sort((a, b) => Number(b.ratings) - Number(a.ratings))?.map((service) => {
             return (
               <View key={service?._id} className=" flex flex-col items-center ">
                 <Image  containerStyle={{width: 100, height : 100, objectFit : "cover", borderRadius : 10}} source={{uri : service?.serviceProfileImage}} /> 
                   <View className="w-full mt-1.5">
-                    {/* <StarRatingDisplay  style={{width : 110, display : 'flex', justifyContent : 'space-evenly'}} color="#ffa534" maxStars={5} starSize={20} rating={service?.ratings} /> */}
-                  <Text className="text-gray-400 font-medium text-xs mt-1">{service?.ratings}</Text>
+                  <Rating baseColor='#f2f2f2' size={15} rating={Number(service.ratings)} spacing={5} disabled />
+                  <Text className="text-gray-400 font-medium text-xs mt-1">{service?.ratings} ({service?.totalReviews})</Text>
                 </View>
               </View>
             )

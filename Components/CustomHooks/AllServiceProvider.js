@@ -5,7 +5,7 @@ import http from '../../http';
 import React from 'react'
 
 const useServices = () => {
-    const [services, setServices] = useState([])
+    const [services, setServices] = useState(null)
     const accessToken = SecureStore.getItem('accessToken')
 
     const getServices = async () => {

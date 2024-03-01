@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import useServices from '../../CustomHooks/AllServiceProvider'
 import { useFocusEffect } from '@react-navigation/native'
 import {FontAwesome} from '@expo/vector-icons'
-import {StarRatingDisplay} from 'react-native-star-rating-widget';
+import { Rating } from '@kolking/react-native-rating';
 import { Skeleton } from '@rneui/themed';
 import { Image } from '@rneui/themed'
 
@@ -24,9 +24,9 @@ const RecentServices = ({services, navigation}) => {
   return (
     <View className="w-full h-[220px] flex bg-white rounded-md shadow-sm p-2 ">
 
-    <View className={`${loading ? "flex" : "hidden"} flex-col`}>
+<View className={`${loading ? "flex" : "hidden"} flex-col`}>
       <Skeleton width={150} height={40} />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{display : 'flex', flexDirection : 'row'}} >
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{display : 'flex', flexDirection : 'row'}} className="flex flex-row space-x-3">
       <View className="flex flex-col gap-2 mt-1">
       <Skeleton width={100} height={100} />
       <Skeleton width={70} height={7} />
@@ -75,7 +75,7 @@ const RecentServices = ({services, navigation}) => {
               <View key={service._id} className=" flex flex-col items-center ">
                 <Image  containerStyle={{width: "100%", height : 100, objectFit : "cover", borderRadius : 10}} source={{uri : service.serviceProfileImage}} /> 
                 <View className="w-full mt-1.5">
-                <StarRatingDisplay  style={{width : 110, display : 'flex', justifyContent : 'space-evenly'}} color="#ffa534" maxStars={5} starSize={20} rating={service.ratings} />
+                <Rating baseColor='#f2f2f2' size={15} rating={Number(service.ratings)} spacing={5} disabled />
               <Text className="text-gray-400 font-medium text-xs mt-1">{service.ratings}({service.totalReviews})</Text>
                 </View>
               </View>

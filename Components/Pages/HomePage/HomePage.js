@@ -89,12 +89,12 @@ const HomePage = (props) => {
 
       {/* RecentServices */}
       <View className="w-full">
-        {/* <RecentServices services={services} navigation={navigation} /> */}
+        <RecentServices services={services} navigation={navigation} />
       </View>
 
       {/* Lists */}
       <View className="w-full">
-        {/* <HomeServiceList services={services} /> */}
+        <HomeServiceList services={services} />
       </View>
 
       </ScrollView>
