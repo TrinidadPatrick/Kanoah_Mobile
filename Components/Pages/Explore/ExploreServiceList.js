@@ -14,7 +14,7 @@ const ExploreServiceList = ({serviceList, categories, subCategories, loading, se
     const handleRefresh = async () => {
         setRefreshing(true)
         try {
-            const result = await http.get(`Mobile_GetServicesByFilter?category=${selectedFilterState.category.category_id}&subCategory=${selectedFilterState.subCategory.subCategory_id}&ratings=${selectedFilterState.ratings}`)
+            const result = await http.get(`Mobile_GetServicesByFilter?category=${selectedFilterState.category.category_id}&subCategory=${selectedFilterState.subCategory.subCategory_id}&ratings=${selectedFilterState.ratings}&search=${selectedFilterState.searchValue}`)
             setServiceList(result.data.services)
         } catch (error) {
             console.log(error)

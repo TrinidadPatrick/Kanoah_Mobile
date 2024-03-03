@@ -34,6 +34,22 @@
     },
     "runtimeVersion": {
         "policy": "sdkVersion"
-      }
+      },
+      "plugins": [
+        [
+          "expo-location",
+          {
+            "isAndroidBackgroundLocationEnabled": "Allow $(PRODUCT_NAME) to use your location."
+          },
+         
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsVersion": "10.16.2",
+          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoicGF0cmljazAyMSIsImEiOiJjbHRjMW9kZGkwdmlyMnFtbDc1MjRhdGV6In0.5rKPw2HJPEjw9dEZrL-Mmw"
+        }
+        ]
+      ]
   }
 }
+
+

@@ -10,8 +10,10 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import http from '../../../http'
 import FilterDrawerContent from './FilterDrawerContent'
 import useStore from '../../../store'
+import LocationInput from './LocationInput'
 
 const Explore = () => {
+  const { selectedFilterState, storeFilter, decrement } = useStore();
   const tabBarHeight = useBottomTabBarHeight();
   const [categories, setCategories] = useState(null)
   const [subCategories, setSubCategories] = useState(null)
@@ -49,7 +51,7 @@ const Explore = () => {
     setLoading(true)
     setOpen(false)
     try {
-      const result = await http.get(`Mobile_GetServicesByFilter?category=${filterObject.category.category_id}&subCategory=${filterObject.subCategory.subCategory_id}&ratings=${filterObject.ratings}`)
+      const result = await http.get(`Mobile_GetServicesByFilter?category=${filterObject.category.category_id}&subCategory=${filterObject.subCategory.subCategory_id}&ratings=${filterObject.ratings}&search=${searchValue}`)
       handleSort(selectedSortingOption, result.data.services)
       setLoading(false)
     } catch (error) {
@@ -83,6 +85,19 @@ const Explore = () => {
       default:
         break;
     }
+  }
+
+  const handleSearch = async () => {
+    const newState = {...selectedFilterState, searchValue : searchValue}
+    storeFilter(newState)
+    filterServices(newState)
+  }
+
+  const handleClear = async () => {
+    const newState = {...selectedFilterState, searchValue : ''}
+    storeFilter(newState)
+    const result = await http.get(`Mobile_GetServicesByFilter?category=${selectedFilterState.category.category_id}&subCategory=${selectedFilterState.subCategory.subCategory_id}&ratings=${selectedFilterState.ratings}&search=`)
+    handleSort(selectedSortingOption, result.data.services)
   }
 
 
@@ -119,6 +134,8 @@ const Explore = () => {
         showCancel={false}
         value={searchValue}
         onChangeText={setSearchValue}
+        onSubmitEditing={()=>handleSearch()}
+        onClear={()=>handleClear()}
         lightTheme>
 
         </SearchBar>
@@ -126,6 +143,10 @@ const Explore = () => {
         <TouchableOpacity onPress={() => setOpen((prevOpen) => !prevOpen)} buttonStyle={{backgroundColor : "#f5f5f5"}} radius={"sm"} type="solid">
         <FontAwesome  name='sliders' size={28} color="black" />
         </TouchableOpacity>
+        </View>
+
+        <View>
+          <LocationInput />
         </View>
 
         {/* Sort Options */}
