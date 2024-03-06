@@ -28,24 +28,6 @@ const HomePage = (props) => {
       })
     }
 
-    // useFocusEffect(()=>{
-    //   const getUserProfile = async () => {
-    //     try {
-    //       const result = await http.get(`Mobile_getUser`, {
-    //         headers : {
-    //           'Authorization': `Bearer ${accessToken}`,
-    //           'Content-Type': 'application/json',
-    //         }
-    //       })
-    //       console.log(result.data)
-    //     } catch (error) {
-    //       console.log(error)
-    //     }
-    //   }
-
-    //   getUserProfile()
-    // })
-
 
   return (
     <View style={{rowGap : 15}} className="bg-gray-100 w-full h-full flex flex-col items-center justify-start p-2 ">

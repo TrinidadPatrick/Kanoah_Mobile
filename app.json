@@ -22,7 +22,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.example.mynewapp"
+      "package": "com.example.mynewapp",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAVDyfYAh_unbWuN6Fq6q1BPJ1GkkihmRM"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,23 +38,15 @@
       }
     },
     "runtimeVersion": {
-        "policy": "sdkVersion"
-      },
-      "plugins": [
-        [
-          "expo-location",
-          {
-            "isAndroidBackgroundLocationEnabled": "Allow $(PRODUCT_NAME) to use your location."
-          },
-         
-        "@rnmapbox/maps",
+      "policy": "sdkVersion"
+    },
+    "plugins": [
+      [
+        "expo-location",
         {
-          "RNMapboxMapsVersion": "10.16.2",
-          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoicGF0cmljazAyMSIsImEiOiJjbHRjMW9kZGkwdmlyMnFtbDc1MjRhdGV6In0.5rKPw2HJPEjw9dEZrL-Mmw"
+          "isAndroidBackgroundLocationEnabled": "Allow $(PRODUCT_NAME) to use your location."
         }
-        ]
       ]
+    ]
   }
 }
-
-

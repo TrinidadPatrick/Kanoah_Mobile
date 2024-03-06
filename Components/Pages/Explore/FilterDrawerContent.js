@@ -8,31 +8,23 @@ import useStore from '../../../store'
 import http from '../../../http'
 
     const FilterDrawerContent = ({categories, subCategories, filterServices, setLoading}) => {
-      const { selectedFilterState, storeFilter, decrement } = useStore();
+    const { selectedFilterState, storeFilter } = useStore();
     const [ratings, setRatings] = useState([{number : 5, checked : false}, {number : 4, checked : false}, {number : 3, checked : false}, {number : 2, checked : false}, {number : 1, checked : false}])
     const [selectedFilter, setSelectedFilter] = useState({
         category : {name : '', category_code : '', category_id : ''},
         subCategory : {name : '', subCategory_id : ''},
         ratings : [],
-        searchValue : ''
+        searchValue : '',
+        coordinates : {latitude : selectedFilterState.coordinates.latitude, longitude : selectedFilterState.coordinates.longitude},
+        radius : selectedFilterState.radius
     })
 
-    //     const getCategories = async () => {
-    //         const categories = await http.get('getCategories')
-    //         setCategories(categories.data.filter((category) => category.type === "Category"));
-    //         setSubCategories(categories.data.filter((category) => category.type === "SubCategory"));
-    //     }
-
-    //     getCategories()
-    // },[])
-
-    // Handles the selection of category filter
+   
     const handleSelectCategory = (value) => {
         const selectedCategory = categories.find((category) => category.name === value)
         if(selectedCategory)
         {
-            setSelectedFilter({...selectedFilter, category : {name : selectedCategory.name, category_code : selectedCategory.category_code, category_id : selectedCategory._id}})
-            setSelectedFilter((prev) => ({...prev, subCategory : {name : '', subCategory_id : ''}}))
+            storeFilter({...selectedFilterState, category : {name : selectedCategory.name, category_code : selectedCategory.category_code, category_id : selectedCategory._id}, subCategory : {name : '', subCategory_id : ''}})
         }
     }
 
@@ -40,7 +32,7 @@ import http from '../../../http'
       const selectedSubCategory = subCategories.find((subCategory) => subCategory.name === value)
       if(selectedSubCategory)
       {
-          setSelectedFilter({...selectedFilter, subCategory : {name : selectedSubCategory.name, subCategory_id : selectedSubCategory._id}})
+          storeFilter({...selectedFilterState, subCategory : {name : selectedSubCategory.name, subCategory_id : selectedSubCategory._id}})
       }
   }
 
@@ -48,33 +40,34 @@ import http from '../../../http'
         const newData = [...ratings]
         newData[index].checked = newData[index].checked ? false : true
         setRatings(newData)
-        setSelectedFilter({...selectedFilter, ratings : newData.filter((rating) => rating.checked === true).map((rating)=> rating.number)})
+        storeFilter({...selectedFilterState, ratings : newData.filter((rating) => rating.checked === true).map((rating)=> rating.number)})
     }
+    
 
     const clearFilter = () => {
-      setSelectedFilter({
-        category : {name : '', category_code : '', category_id : ''},
-        subCategory : {name : '', subCategory_id : ''},
-        ratings : [],
-      })
 
       filterServices({
         category : {name : '', category_code : '', category_id : ''},
         subCategory : {name : '', subCategory_id : ''},
-        ratings : []
+        ratings : [],
+        searchValue : "",
+        coordinates : {latitude : selectedFilterState.coordinates.latitude, longitude : selectedFilterState.coordinates.longitude},
+        radius : selectedFilterState.radius
       })
 
       storeFilter({
         category : {name : '', category_code : '', category_id : ''},
         subCategory : {name : '', subCategory_id : ''},
-        ratings : []
+        ratings : [],
+        searchValue : "",
+        coordinates : {latitude : selectedFilterState.coordinates.latitude, longitude : selectedFilterState.coordinates.longitude},
+        radius : selectedFilterState.radius
       })
 
       setRatings([{number : 5, checked : false}, {number : 4, checked : false}, {number : 3, checked : false}, {number : 2, checked : false}, {number : 1, checked : false}])
     }
 
-
-
+    
   return (
     <ScrollView contentContainerStyle={{display : 'flex',flexDirection : 'column',rowGap : 15, justifyContent : 'space-between', height : "100%"}} className="p-2 flex flex-col  h-full">
     <View style={{rowGap : 15}} className="flex flex-col">
@@ -86,7 +79,7 @@ import http from '../../../http'
       <View>
         <Text className="text-lg font-medium text-gray-600">Categories</Text>
         <SelectList 
-        defaultOption={categories === null ? {} : {key: selectedFilter.category.name, value: selectedFilter.category.name }}
+        defaultOption={categories === null ? {} : {key: selectedFilterState.category.name, value: selectedFilterState.category.name }}
         boxStyles={{marginTop : 10, borderRadius : 5}}
         data={categories?.map((category) => ({ key: category.name, value: category.name}))} 
         setSelected={(val) => handleSelectCategory(val)}
@@ -97,9 +90,9 @@ import http from '../../../http'
       <View>
         <Text className="text-lg font-medium text-gray-600">Sub Categories</Text>
         <SelectList 
-        defaultOption={subCategories === null ? {} : {key: selectedFilter.subCategory.name, value: selectedFilter.subCategory.name }}
+        defaultOption={subCategories === null ? {} : {key: selectedFilterState.subCategory.name, value: selectedFilterState.subCategory.name }}
         boxStyles={{marginTop : 10, borderRadius : 5}}
-        data={subCategories?.filter((subCat) => subCat.parent_code === selectedFilter.category.category_code).map((subCategory) => ({ key: subCategory.name, value: subCategory.name}))} 
+        data={subCategories?.filter((subCat) => subCat.parent_code === selectedFilterState.category.category_code).map((subCategory) => ({ key: subCategory.name, value: subCategory.name}))} 
         setSelected={(val) => handleSelectSubCategory(val)}
         labelKey="name"
         />
@@ -127,7 +120,7 @@ import http from '../../../http'
 
       {/* Apply and Reset button */}
       <View style={{rowGap : 5}} className="flex flex-col justify-self-end">
-        <TouchableOpacity onPress={()=>{filterServices(selectedFilter);storeFilter(selectedFilter)}} className="flex items-center bg-themeOrange py-2.5 rounded-sm" >
+        <TouchableOpacity onPress={()=>{filterServices(selectedFilterState)}} className="flex items-center bg-themeOrange py-2.5 rounded-sm" >
             <Text className="text-white">Apply</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={()=>clearFilter()} className="flex items-center bg-gray-200 py-2.5 rounded-sm" >

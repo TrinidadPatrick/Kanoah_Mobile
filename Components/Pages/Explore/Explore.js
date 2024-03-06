@@ -12,7 +12,7 @@ import FilterDrawerContent from './FilterDrawerContent'
 import useStore from '../../../store'
 import LocationInput from './LocationInput'
 
-const Explore = () => {
+const Explore = ({navigation}) => {
   const { selectedFilterState, storeFilter, decrement } = useStore();
   const tabBarHeight = useBottomTabBarHeight();
   const [categories, setCategories] = useState(null)
@@ -23,19 +23,6 @@ const Explore = () => {
   const [selectedSortingOption, setSelectedSortingOption] = useState('Latest')
   const [searchValue, setSearchValue] = useState('')
 
-  useEffect(()=>{
-    const getServices = async () => {
-     try {
-         const result = await http.get(`Mobile_GetServices`)
-          handleSort(selectedSortingOption, result.data)
-         setLoading(false)
-     } catch (error) {
-         console.log(error)
-     }
-    }
-
-    getServices()
- },[])
 
   useEffect(()=>{
     const getCategories = async () => {
@@ -51,7 +38,7 @@ const Explore = () => {
     setLoading(true)
     setOpen(false)
     try {
-      const result = await http.get(`Mobile_GetServicesByFilter?category=${filterObject.category.category_id}&subCategory=${filterObject.subCategory.subCategory_id}&ratings=${filterObject.ratings}&search=${searchValue}`)
+      const result = await http.get(`Mobile_GetServicesByFilter?category=${filterObject.category.category_id}&subCategory=${filterObject.subCategory.subCategory_id}&ratings=${filterObject.ratings}&search=&latitude=${filterObject?.coordinates.latitude}&longitude=${filterObject?.coordinates.longitude}&radius=${filterObject?.radius}`)
       handleSort(selectedSortingOption, result.data.services)
       setLoading(false)
     } catch (error) {
@@ -96,9 +83,11 @@ const Explore = () => {
   const handleClear = async () => {
     const newState = {...selectedFilterState, searchValue : ''}
     storeFilter(newState)
-    const result = await http.get(`Mobile_GetServicesByFilter?category=${selectedFilterState.category.category_id}&subCategory=${selectedFilterState.subCategory.subCategory_id}&ratings=${selectedFilterState.ratings}&search=`)
+    const result = await http.get(`Mobile_GetServicesByFilter?category=${selectedFilterState.category.category_id}&subCategory=${selectedFilterState.subCategory.subCategory_id}&ratings=${selectedFilterState.ratings}&search=&latitude=${selectedFilterState.coordinates.latitude}&longitude=${selectedFilterState.coordinates.longitude}&radius=${selectedFilterState.radius}`)
     handleSort(selectedSortingOption, result.data.services)
   }
+
+
 
 
   return (
@@ -143,10 +132,12 @@ const Explore = () => {
         <TouchableOpacity onPress={() => setOpen((prevOpen) => !prevOpen)} buttonStyle={{backgroundColor : "#f5f5f5"}} radius={"sm"} type="solid">
         <FontAwesome  name='sliders' size={28} color="black" />
         </TouchableOpacity>
+
+        
         </View>
 
         <View>
-          <LocationInput />
+          <LocationInput navigation={navigation} setServiceList={setServiceList} selectedSortingOption={selectedSortingOption} filterServices={filterServices} />
         </View>
 
         {/* Sort Options */}

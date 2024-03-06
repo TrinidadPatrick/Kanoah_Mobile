@@ -19,6 +19,10 @@ import VerifyEmailByOtp from './Components/Pages/RegisterPage/VerifyEmailByOtp';
 import Explore from './Components/Pages/Explore/Explore';
 import TopRatedViewAll from './Components/Pages/HomePage/TopRatedViewAll';
 import RecentServicesViewAll from './Components/Pages/HomePage/RecentServicesViewAll';
+import Account from './Components/Pages/Account/Account';
+import Profile from './Components/Pages/Account/AccountSettings/ProfileSettings/Profile';
+import AddressSetup from './Components/Pages/Account/AccountSettings/ProfileSettings/AddressSetup';
+import MapFullScreen from './Components/Pages/Account/AccountSettings/ProfileSettings/MapFullScreen';
 
 export default function App() {
   const Stack = createNativeStackNavigator()
@@ -60,7 +64,7 @@ export default function App() {
             ),
           }}
           />
-          <Tab.Screen name="Account" component={HomePage}
+          <Tab.Screen name="Account" component={Account}
           options={{ headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="user" size={size} color={color} />
@@ -87,6 +91,9 @@ export default function App() {
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: true }} />
       <Stack.Screen name="InputOtp" component={InputOtp} options={{ headerShown: true, headerTitle : "Enter Verification Code" }} />
       <Stack.Screen name="NewPassword" component={NewPassword} options={{ headerShown: true, headerTitle : "Enter New Password" }} />
+      <Stack.Screen name="Profile" component={Profile} options={{ headerShown: true, headerTitle : "Edit Profile" }} />
+      <Stack.Screen name="AddressSetup" component={AddressSetup} options={{ headerShown: true, headerTitle : "Address" }} />
+      <Stack.Screen name="MapFullScreen" component={MapFullScreen} options={{ headerShown: true, headerTitle : "Pin Location" }} />
     </Stack.Navigator>
       </NavigationContainer>
       <MainStatusbar style="auto" />
