@@ -1,4 +1,4 @@
-import { View, Text, TouchableHighlight, TouchableOpacity, TouchableNativeFeedback } from 'react-native'
+import { View, Text, TouchableHighlight, TouchableOpacity, TouchableNativeFeedback, ScrollView } from 'react-native'
 import React from 'react'
 import { SearchBar } from 'react-native-elements'
 import { Button } from '@rneui/themed'
@@ -14,7 +14,7 @@ import LocationInput from './LocationInput'
 
 const Explore = ({navigation}) => {
   const { selectedFilterState, storeFilter, decrement } = useStore();
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarHeight = useBottomTabBarHeight() * 3;
   const [categories, setCategories] = useState(null)
   const [subCategories, setSubCategories] = useState(null)
   const [open, setOpen] = useState(false);
@@ -38,7 +38,7 @@ const Explore = ({navigation}) => {
     setLoading(true)
     setOpen(false)
     try {
-      const result = await http.get(`Mobile_GetServicesByFilter?category=${filterObject.category.category_id}&subCategory=${filterObject.subCategory.subCategory_id}&ratings=${filterObject.ratings}&search=&latitude=${filterObject?.coordinates.latitude}&longitude=${filterObject?.coordinates.longitude}&radius=${filterObject?.radius}`)
+      const result = await http.get(`Mobile_GetServicesByFilter?category=${filterObject.category.category_id}&subCategory=${filterObject.subCategory.subCategory_id}&ratings=${filterObject.ratings}&search=${filterObject.searchValue}&latitude=${filterObject?.coordinates.latitude}&longitude=${filterObject?.coordinates.longitude}&radius=${filterObject?.radius}`)
       handleSort(selectedSortingOption, result.data.services)
       setLoading(false)
     } catch (error) {
@@ -87,11 +87,10 @@ const Explore = ({navigation}) => {
     handleSort(selectedSortingOption, result.data.services)
   }
 
-
-
+  console.log(tabBarHeight.toFixed(0))
 
   return (
-    <View className="w-full h-[100%] flex flex-col justify-start">
+    <View className="w-full h-[100%] flex flex-col justify-start ">
         <Drawer
         open={open}
         onOpen={() => setOpen(true)}
@@ -103,6 +102,7 @@ const Explore = ({navigation}) => {
         >
         
         {/* Search Bar */}
+        <View className="w-full ">
         <View style={{columnGap : 10}} className="w-full flex flex-row items-center justify-evenly mt-2 px-2">
         <SearchBar containerStyle={{
           backgroundColor: 'white', // set background color to transparent
@@ -139,6 +139,7 @@ const Explore = ({navigation}) => {
         <View>
           <LocationInput navigation={navigation} setServiceList={setServiceList} selectedSortingOption={selectedSortingOption} filterServices={filterServices} />
         </View>
+        
 
         {/* Sort Options */}
         <View className="w-full flex flex-row justify-between py-2">
@@ -155,10 +156,11 @@ const Explore = ({navigation}) => {
             <Text className={`text-sm ${selectedSortingOption === "Low Rated" ? "text-themeOrange" : "text-gray-500"}`}>Low Rated</Text>
           </TouchableOpacity>
         </View>
+        </View>
 
         {/* Service Lists */}
-        <View className={`h-full px-3 pt-3`} style={{paddingBottom : tabBarHeight + 50}}>
-          <ExploreServiceList setServiceList={setServiceList} loading={loading} serviceList={serviceList} categories={categories} subCategories={subCategories} />
+        <View style={{paddingBottom : Number(tabBarHeight.toFixed(0))}} className={` h-[100%] px-3 `} >
+          <ExploreServiceList navigation={navigation} setServiceList={setServiceList} loading={loading} serviceList={serviceList} categories={categories} subCategories={subCategories} />
         </View>
 
         </Drawer>

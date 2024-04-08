@@ -1,10 +1,10 @@
-import { View, Text, FlatList, ScrollView } from 'react-native'
+import { View, Text, FlatList, ScrollView, Touchable, TouchableOpacity, TouchableNativeFeedback, TouchableWithoutFeedback } from 'react-native'
 import React from 'react'
 import useServices from '../../CustomHooks/AllServiceProvider'
 import { Rating } from '@kolking/react-native-rating';
 import { Image } from 'react-native-elements'
 
-const HomeServiceList = ({services}) => {
+const HomeServiceList = ({services, navigation}) => {
 
     
   return (
@@ -12,7 +12,9 @@ const HomeServiceList = ({services}) => {
     {
         services?.map((service)=>{
             return (
-                <View key={service._id} className="w-[48%] flex flex-col justify-start overflow-hidden bg-white rounded-md shadow-sm">
+                // <TouchableOpacity >
+                <TouchableWithoutFeedback onPress={()=>navigation.navigate('ViewService', {serviceId : service._id})} key={service._id} >
+                <View className="w-[48%] flex flex-col justify-start overflow-hidden bg-white rounded-md shadow-sm" >
                 <Image style={{width : "100%", height : 150, objectFit : "cover"}} source={{uri : service.serviceProfileImage }} />
                 <View className="w-full p-2">
                 {/* Service Title */}
@@ -28,6 +30,8 @@ const HomeServiceList = ({services}) => {
                 </View>
                 </View>
                 </View>
+                </TouchableWithoutFeedback>
+                // </TouchableOpacity>
             )
         })
     }

@@ -1,7 +1,8 @@
 import 'react-native-gesture-handler';
 import { StatusBar as MainStatusbar } from 'expo-status-bar';
-import { StyleSheet, Text, View, StatusBar } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { StyleSheet, Text, View, StatusBar, TouchableOpacity ,Linking } from 'react-native';
+import { Entypo} from 'react-native-vector-icons'
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomePage from './Components/Pages/HomePage/HomePage';
@@ -23,6 +24,14 @@ import Account from './Components/Pages/Account/Account';
 import Profile from './Components/Pages/Account/AccountSettings/ProfileSettings/Profile';
 import AddressSetup from './Components/Pages/Account/AccountSettings/ProfileSettings/AddressSetup';
 import MapFullScreen from './Components/Pages/Account/AccountSettings/ProfileSettings/MapFullScreen';
+import ChangePasswordProfile from './Components/Pages/Account/AccountSettings/ProfileSettings/ChangePasswordProfile';
+import ViewService from './Components/Pages/ViewService/ViewService';
+import ViewAllRatings from './Components/Pages/ViewService/ViewAllRatings';
+import ViewAllGallery from './Components/Pages/ViewService/ViewAllGallery';
+import BookService from './Components/Pages/BookService/BookService';
+import ServiceOptionList from './Components/Pages/BookService/ServiceOptionList';
+import AddressModal from './Components/Pages/BookService/AddressModal';
+import BookConfirmation from './Components/Pages/BookService/BookConfirmation';
 
 export default function App() {
   const Stack = createNativeStackNavigator()
@@ -77,8 +86,9 @@ export default function App() {
 
 
 
+
   return (
-    <View style={{ flex: 1, paddingTop: StatusBar.currentHeight, backgroundColor: 'white', overflow: 'auto' }}>
+    <View className="w-full h-screen flex flex-col" style={{ flex: 1, paddingTop: StatusBar.currentHeight, backgroundColor: 'white', overflow: 'auto', }}>
       <NavigationContainer>
       <Stack.Navigator initialRouteName="HomePage" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomePage" component={HomeStackScreen} />
@@ -94,6 +104,18 @@ export default function App() {
       <Stack.Screen name="Profile" component={Profile} options={{ headerShown: true, headerTitle : "Edit Profile" }} />
       <Stack.Screen name="AddressSetup" component={AddressSetup} options={{ headerShown: true, headerTitle : "Address" }} />
       <Stack.Screen name="MapFullScreen" component={MapFullScreen} options={{ headerShown: true, headerTitle : "Pin Location" }} />
+      <Stack.Screen name="ChangePasswordProfile" component={ChangePasswordProfile} options={{ headerShown: true, headerTitle : "Change Password" }} />
+      <Stack.Screen name="ViewService" component={ViewService} options={{ headerShown: true, headerTitle : "", headerTransparent : true, headerTintColor : "white" }} />
+      <Stack.Screen name="ViewAllRatings" component={ViewAllRatings} options={{ headerShown: true, headerTitle : "Ratings" }} />
+      <Stack.Screen name="ViewAllGallery" component={ViewAllGallery} options={{ headerShown: true, headerTitle : "Service Gallery" }} />
+
+      {/* Booking stack */}
+      <Stack.Screen name="BookService" component={BookService} options={{ headerShown: false, headerTitle : "Book Service" }} />
+      <Stack.Screen name="ServiceOptionList" component={ServiceOptionList} options={{ headerShown: true, headerTitle : "Service Option" }} />
+      <Stack.Screen name="AddressModal" component={AddressModal} options={{ headerShown: true, headerTitle : "Set location" }} />
+      <Stack.Screen name="BookConfirmation" component={BookConfirmation} options={{ headerShown: true, headerTitle : "Confirm Booking" }} />
+
+      
     </Stack.Navigator>
       </NavigationContainer>
       <MainStatusbar style="auto" />

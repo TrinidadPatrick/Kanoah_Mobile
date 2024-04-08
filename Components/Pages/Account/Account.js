@@ -12,7 +12,6 @@ const Account = ({navigation}) => {
     React.useCallback(()=> {
       const authenticate = async () => {
         const accessToken = await SecureStore.getItemAsync('accessToken');
-        console.log(accessToken)
         if(accessToken !== null)
         {
           setIsLoggedIn(true)
@@ -46,12 +45,12 @@ const Account = ({navigation}) => {
           <TouchableOpacity onPress={()=>navigation.navigate("Login")} className="bg-themeOrange px-4 py-2 rounded-sm">
             <Text className="text-white">Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity className=" px-4 py-2 rounded-sm">
+          <TouchableOpacity onPress={()=>navigation.navigate('Register')} className=" px-4 py-2 rounded-sm">
             <Text className="text-black">Sign up</Text>
           </TouchableOpacity>
         </View>
         :
-      <View>
+      <View className="h-[95%]">
       <View className="mt-10">
         <View className="flex flex-row items-center gap-2 border-b-[1px] pb-2 border-gray-300">
         <FontAwesome name="user-o" size={20} color="black" />
@@ -117,7 +116,7 @@ const Account = ({navigation}) => {
       </View>
 
 
-      <TouchableOpacity onPress={()=>logout()} style={{ alignSelf: 'center', paddingHorizontal: 15, paddingVertical : 10, shadowColor: '#171717'}} className="flex bg-white shadow-sm flex-row items-center rounded-full absolute bottom-10">
+      <TouchableOpacity onPress={()=>logout()} style={{ alignSelf: 'center', paddingHorizontal: 15, paddingVertical : 10, shadowColor: '#171717'}} className="flex bg-white shadow-sm flex-row items-center rounded-full absolute bottom-0">
         <Entypo name="log-out" size={20} color="red" />
         <Text className="font-medium text-red-500">Logout</Text>
       </TouchableOpacity>

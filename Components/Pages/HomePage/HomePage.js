@@ -76,7 +76,7 @@ const HomePage = (props) => {
 
       {/* Lists */}
       <View className="w-full">
-        <HomeServiceList services={services} />
+        <HomeServiceList navigation={navigation} services={services} />
       </View>
 
       </ScrollView>

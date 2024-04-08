@@ -15,7 +15,11 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.mynewapp"
+      "bundleIdentifier": "com.example.mynewapp",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow access to the camera",
+        "NSPhotoLibraryUsageDescription": "Allow access to the photo library"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -23,11 +27,16 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.example.mynewapp",
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyAVDyfYAh_unbWuN6Fq6q1BPJ1GkkihmRM"
-        }
-      }
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -47,6 +56,9 @@
           "isAndroidBackgroundLocationEnabled": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
-    ]
+    ],
+    "updates": {
+      "url": "https://u.expo.dev/36105a23-262d-4b13-9cc9-f0145ab91bb5"
+    }
   }
 }

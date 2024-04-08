@@ -72,13 +72,13 @@ const RecentServices = ({services, navigation}) => {
         {
           services?.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map((service, index) => {
             return (
-              <View key={service._id} className=" flex flex-col items-center ">
+              <TouchableOpacity onPress={()=>navigation.navigate('ViewService', {serviceId : service._id})} key={service._id} className=" flex flex-col items-center ">
                 <Image  containerStyle={{width: "100%", height : 100, objectFit : "cover", borderRadius : 10}} source={{uri : service.serviceProfileImage}} /> 
                 <View className="w-full mt-1.5">
                 <Rating baseColor='#f2f2f2' size={15} rating={Number(service.ratings)} spacing={5} disabled />
               <Text className="text-gray-400 font-medium text-xs mt-1">{service.ratings}({service.totalReviews})</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             )
           })
         }

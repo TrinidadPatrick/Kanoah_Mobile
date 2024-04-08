@@ -69,15 +69,15 @@ const FillInfo = ({route, navigation}) => {
 
         {/* Buttons */}
         <View style={{columnGap : 3}} className="w-full flex flex-row justify-center ">
-        <Pressable columnGap={10} className="bg-themeBlue px-10  py-2 flex flex-row justify-center items-center rounded-sm" title='Sign In' >
+        <Pressable columnGap={10} className="bg-white px-10  py-2 flex flex-row justify-center items-center rounded-sm" title='Sign In' >
         <FontAwesome name='user' size={18} color="white"/>
-            <Text className="text-white text-sm">
+            <Text className="text-black text-sm">
             Sign In
             </Text>
         </Pressable>
-        <Pressable columnGap={10} className="bg-white px-10  py-2 flex flex-row justify-center items-center rounded-sm" title='Sign In' >
-        <FontAwesome name='user-plus' size={18} color="black"/>
-            <Text className="text-black text-sm">
+        <Pressable columnGap={10} className="bg-themeBlue px-10  py-2 flex flex-row justify-center items-center rounded-sm" title='Sign In' >
+        <FontAwesome name='user-plus' size={18} color="white"/>
+            <Text className="text-white text-sm">
             Sign Up
             </Text>
         </Pressable>

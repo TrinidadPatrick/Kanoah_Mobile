@@ -16,7 +16,7 @@ const AddressSetup = ({route, navigation}) => {
     longitude : profile.Address === null ? 120.8236601 : profile.Address?.longitude ,
     latitude : profile.Address === null ? 14.5964466 : profile.Address?.latitude
   })
-  const [street, setStreet] = useState(profile.Address.street)
+  const [street, setStreet] = useState(profile.Address === null ? "" : profile.Address.street)
   const [locCodesSelected, setLocCodesSelected] = useState([
     ['', '-1'], //Region
     ['','-1'], //Province
@@ -134,22 +134,27 @@ const AddressSetup = ({route, navigation}) => {
       longitude : location.longitude,
       latitude : location.latitude
     }
-    console.log(address)
     
-  //   const newProfile = {...profile, Address : address}
-  //   try {
-  //     const result = await http.patch('Mobile_updateProfile', newProfile, {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           'Content-Type': 'application/json',
-  //         },
-  //       })
-  //       navigation.goBack()
-  // } catch (error) {
-  //     console.log(error)
-  // }
+    const newProfile = {...profile, Address : address}
+    onUpdate(newProfile)
+    try {
+      const result = await http.patch('Mobile_updateProfile', newProfile, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
+        navigation.goBack()
+  } catch (error) {
+      console.log(error)
+  }
     
   }
+
+  const getCoordinatesFromFullScreenMap = (location) => {
+    setLocation(location)
+  }
+  
   return (
     <View className="h-full relative flex flex-col p-3 bg-white">
       {/* Region */}
@@ -263,7 +268,7 @@ const AddressSetup = ({route, navigation}) => {
         draggable
         tappable
         
-        onDrag={handleMarkerDragEnd}
+        onDragEnd={handleMarkerDragEnd}
       />
       </MapView>
       <View className="absolute top-0 p-1 w-full">
@@ -282,7 +287,7 @@ const AddressSetup = ({route, navigation}) => {
       }}
       />
       </View>
-      <TouchableOpacity onPress={()=>navigation.navigate('MapFullScreen', {profile})} className="absolute bottom-2 right-2">
+      <TouchableOpacity onPress={()=>navigation.navigate('MapFullScreen', {profile, submit : getCoordinatesFromFullScreenMap})} className="absolute bottom-2 right-2">
       <FontAwesome className={``} name="expand" size={22} color="gray" />
       </TouchableOpacity>
       </View>

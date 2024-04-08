@@ -1,11 +1,12 @@
-import { View, Text } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import MapView, { Marker, PROVIDER_GOOGLE, Circle } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import {FontAwesome, Entypo} from 'react-native-vector-icons'
+import axios from 'axios';
 
 const MapFullScreen = ({route, navigation}) => {
-    const {profile} = route.params
+    const {profile, submit} = route.params
     const [location, setLocation] = useState({
         longitude : profile.Address.longitude,
         latitude : profile.Address.latitude
@@ -44,13 +45,22 @@ const MapFullScreen = ({route, navigation}) => {
     
     const handleMarkerDragEnd = async (e) => {
         const { latitude, longitude } = e.nativeEvent.coordinate;
+        setLocation({ latitude, longitude })
+        // console.log({ latitude, longitude })
         const response = await axios.get(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-          );
+        );
         // console.log(response.data.display_name)
     };
 
-    console.log(location)
+    const submitPin = () => {
+        // const newProfile = {...profile, Address: profile.Address, location};
+        // console.log(location)
+        // console.log(newProfile.Address.longitude, newProfile.Address.latitude)
+        submit(location)
+        navigation.goBack()
+    }
+    // console.log(location)
   return (
     <View className="h-full relative flex">
       <MapView
@@ -82,7 +92,7 @@ const MapFullScreen = ({route, navigation}) => {
         draggable
         tappable
         
-        onDrag={handleMarkerDragEnd}
+        onDragEnd={handleMarkerDragEnd}
       />
       </MapView>
 
@@ -95,7 +105,6 @@ const MapFullScreen = ({route, navigation}) => {
             longitude : details.geometry.location.lng,
             latitude : details.geometry.location.lat
         })
-        console.log(details.geometry.location);
       }}
       fetchDetails
       styles={{textInput : {paddingHorizontal : 38}}}
@@ -105,6 +114,10 @@ const MapFullScreen = ({route, navigation}) => {
       }}
       />
       </View>
+
+      <TouchableOpacity onPress={()=>submitPin()} className="absolute bottom-5 bg-themeOrange w-[90%] self-center py-2 rounded-sm" >
+        <Text className="text-white text-center">Confirm Location</Text>
+      </TouchableOpacity>
     </View>
   )
 }

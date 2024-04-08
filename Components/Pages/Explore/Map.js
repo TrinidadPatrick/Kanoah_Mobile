@@ -14,9 +14,10 @@ const Map = ({location, setLocation, setSelectedAddress, setAddress, selectedAdd
         const { latitude, longitude } = e.nativeEvent.coordinate;
         setLocation({latitude, longitude})
         const response = await axios.get(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`
           );
-        setSelectedAddress(response.data.display_name)
+        setSelectedAddress(response.data.plus_code.compound_code)
+        console.log(response.data)
     };
 
     const customMapStyle = [
@@ -50,6 +51,8 @@ const Map = ({location, setLocation, setSelectedAddress, setAddress, selectedAdd
         },
         // Add more styling rules as needed
     ];
+
+    // console.log(location)
 
 
   return (
