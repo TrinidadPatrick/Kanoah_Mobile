@@ -36,10 +36,10 @@ const ViewService = ({route, navigation}) => {
      })
     }
 
+
     // Clears the booking data
     useFocusEffect(
       React.useCallback(() => {
-        console.log('Screen focused'); // Example log
         storeBookingInformation({service : null, schedule : null, contactAndAddress : null})
   
         return () => {

@@ -131,9 +131,9 @@ const SetSchedule = ({service, userInformation, bookingInformation, storeBooking
     if(timeSelected !== '')
     {
         const dateTimeString = selectedDate + " " + timeSelected;
-        const dateTimeUtcString = Moment.utc(dateTimeString, 'YYYY-MM-DD hh:mm A').format(); // Convert to UTC format
+        const dateTimeUtcString = Moment.utc(dateTimeString, 'YYYY-MM-DD hh:mm A').format(); 
 
-        const dateTime = new Date(dateTimeUtcString); // Create Date object
+        const dateTime = new Date(dateTimeUtcString);
 
         // Add minutes to the date
         dateTime.setMinutes(dateTime.getMinutes() + bookingInformation.service.duration);
@@ -174,27 +174,26 @@ const SetSchedule = ({service, userInformation, bookingInformation, storeBooking
     // Sets the time available for the current day
     useEffect(()=>{
         const schedule = service?.serviceHour.find((serviceHour) => serviceHour.day === currentDay)
-        
         const fromDate = new Date(`2000-01-01T${schedule?.fromTime}:00`);
         const toDate = new Date(`2000-01-01T${schedule?.toTime}:00`);
-  
+        // console.log(new Date(fromDate), toDate)
         const timeArray = [];
   
         let currentTime = fromDate;
         while (currentTime <= toDate) {
           const endTime = new Date(currentTime);
           endTime.setMinutes(endTime.getMinutes() + bookingInformation.service.duration);
-      
+          
           // Check if the end time is within the service hours
           if (endTime <= toDate) {
+            
             const formattedTime = currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
             timeArray.push(formattedTime);
           }
-      
           // Increment the current time by the interval in minutes
           currentTime.setMinutes(currentTime.getMinutes() + 30);
         }
-      
+        
         setBookingTimeSlot(timeArray);
     },[currentDay, selectedDate])
 

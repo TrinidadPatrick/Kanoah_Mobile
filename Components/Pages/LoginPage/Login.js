@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {FontAwesome} from '@expo/vector-icons'
 import http from '../../../http';
+import useInfo from '../../CustomHooks/UserInfoProvider';
 import * as SecureStore from 'expo-secure-store';
 
 
 const Login = (props) => {
+    const {setIsLoggedIn} =useInfo()
     const navigation = props.navigation
     const [userInfos, setUserInfo] = useState({
         UsernameOrEmail : "",
@@ -20,7 +22,6 @@ const Login = (props) => {
     setIsLoading(true)
     try {
         const result = await http.post(`loginMobile`, userInfos)
-        console.log(result.data)
         if(result.data.status === "authenticated"){
             await SecureStore.setItemAsync('accessToken', result.data.accessToken)
             navigation.navigate('Home')

@@ -22,7 +22,6 @@ import { Skeleton } from '@rneui/themed';
   },[services])
 
 
-  // console.log(services[0].ratings)
   return (
     <View className="w-full h-[220px] flex bg-white rounded-md shadow-sm p-2 ">
 

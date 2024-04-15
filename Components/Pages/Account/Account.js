@@ -1,31 +1,40 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import {FontAwesome, Entypo} from 'react-native-vector-icons'
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
+import useInfo from '../../CustomHooks/UserInfoProvider';
+import http from '../../../http';
 
 const Account = ({navigation}) => {
- 
-  const [isLoggedIn, setIsLoggedIn] = useState(null)
+  const {isLoggedIn, userInformation, setIsLoggedIn} = useInfo()
+  const [serviceInfo, setServiceInfo] = useState(null)
 
   useFocusEffect(
-    React.useCallback(()=> {
-      const authenticate = async () => {
-        const accessToken = await SecureStore.getItemAsync('accessToken');
-        if(accessToken !== null)
+    useCallback(()=>{
+      const getServiceInformation = async () => {
+        const accessToken = await SecureStore.getItemAsync('accessToken')
+        if(accessToken)
         {
-          setIsLoggedIn(true)
-        }
-        else if(accessToken === null){
-          setIsLoggedIn(false)
-        }
-      }
-      authenticate()
-      return () => {
-      
-      }
-    })
+            try {
+                const result = await http.get('Mobile_getService', {
+                    headers : {
+                        'Authorization' : `Bearer ${accessToken}`,
+                        "Content-Type" : 'application/json'
+                    }
+                })
 
+                setServiceInfo(result.data)
+            } catch (error) {
+                console.log(error)
+            }
+            return
+        }
+
+    }
+
+    getServiceInformation()
+    },[])
   )
   
   const logout = async () => {
@@ -40,7 +49,7 @@ const Account = ({navigation}) => {
     <View className="bg-white h-full flex flex-col px-5 py-5 relative">
       <Text className="text-4xl font-medium">Settings</Text>
       {
-        !isLoggedIn ? 
+        isLoggedIn === false ? 
         <View className="w-full h-full flex flex-row justify-center items-center">
           <TouchableOpacity onPress={()=>navigation.navigate("Login")} className="bg-themeOrange px-4 py-2 rounded-sm">
             <Text className="text-white">Login</Text>
@@ -65,17 +74,17 @@ const Account = ({navigation}) => {
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>
             {/* Bookings */}
-            <TouchableOpacity className="flex flex-row items-center justify-between">
+            <TouchableOpacity onPress={()=>navigation.navigate('ClientBookings')} className="flex flex-row items-center justify-between">
             <Text className="font-medium text-gray-500">Your Bookings</Text>
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>
             {/* Blocked Services */}
-            <TouchableOpacity className="flex flex-row items-center justify-between">
+            <TouchableOpacity onPress={()=>navigation.navigate('BlockedServices')} className="flex flex-row items-center justify-between">
             <Text className="font-medium text-gray-500">Blocked Services</Text>
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>
             {/* Favorites */}
-            <TouchableOpacity className="flex flex-row items-center justify-between">
+            <TouchableOpacity onPress={()=>navigation.navigate('Favorites')} className="flex flex-row items-center justify-between">
             <Text className="font-medium text-gray-500">Favorites</Text>
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>
@@ -97,7 +106,7 @@ const Account = ({navigation}) => {
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>
             {/* Bookings */}
-            <TouchableOpacity className="flex flex-row items-center justify-between">
+            <TouchableOpacity onPress={()=>navigation.navigate("MyService",{userInformation, serviceInfo})} className="flex flex-row items-center justify-between">
             <Text className="font-medium text-gray-500">My Service</Text>
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>

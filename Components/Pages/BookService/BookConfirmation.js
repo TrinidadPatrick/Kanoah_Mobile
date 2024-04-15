@@ -50,11 +50,9 @@ const BookConfirmation = ({route, navigation}) => {
         const radLat2 = toRadians(lat2);
         const radLon2 = toRadians(lon2);
 
-        // Calculate differences in coordinates
         const deltaLat = radLat2 - radLat1;
         const deltaLon = radLon2 - radLon1;
 
-        // Haversine formula
         const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
                   Math.cos(radLat1) * Math.cos(radLat2) *
                   Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
@@ -85,11 +83,8 @@ const BookConfirmation = ({route, navigation}) => {
     const handlePay = () => {
         setLoadingGcashPayment(true)
         setTimeout(()=>{
-            setPaid(true)
-            setLoadingGcashPayment(false)
-            setShowPaymentModal(false)
             submitBooking()
-        }, 3000)
+        }, 2000)
     }
 
     const submitBooking = async () => {
@@ -105,8 +100,6 @@ const BookConfirmation = ({route, navigation}) => {
                 }
             } catch (error) {
                 alert(error)
-            } finally {
-                setLoading(false)
             }
            
 
@@ -123,6 +116,10 @@ const BookConfirmation = ({route, navigation}) => {
                 notif_to : receiver,
                 reference_id : booking_id
             })
+            setPaid(true)
+            setLoadingGcashPayment(false)
+            setShowPaymentModal(false)
+            navigation.navigate("ClientBookings")
         } catch (error) {
             console.error(error)
         }
@@ -218,7 +215,7 @@ const BookConfirmation = ({route, navigation}) => {
         {/* Variant */}
         <View className="flex-row justify-between px-2 py-3 border-b-[1px] border-gray-100">
         <Text className="font-medium text-gray-600">Variant</Text>
-        <Text className="font-medium text-gray-900">{bookingInformation.service.selectedVariant !== "" ? bookingInformation.service.selectedVariant : "No variant"}</Text>
+        <Text className="font-medium text-gray-900">{bookingInformation.service.selectedVariant !== "" ? bookingInformation.service.selectedVariant.type : "No variant"}</Text>
         </View>
         {/* Service Option */}
         <View className="flex-row justify-between px-2 py-3 border-b-[1px] border-gray-100">
