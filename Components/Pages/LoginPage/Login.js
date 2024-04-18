@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Button, FlatList, ScrollView, Platform, Image, StyleSheet, Pressable, ImageBackground } from 'react-native'
+import { View, Text, TextInput, Image, BackHandler, Pressable, ImageBackground } from 'react-native'
 import React from 'react'
 import { useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,7 +9,7 @@ import * as SecureStore from 'expo-secure-store';
 
 
 const Login = (props) => {
-    const {setIsLoggedIn} =useInfo()
+    const {setIsLoggedIn} = useInfo()
     const navigation = props.navigation
     const [userInfos, setUserInfo] = useState({
         UsernameOrEmail : "",
@@ -23,6 +23,7 @@ const Login = (props) => {
     try {
         const result = await http.post(`loginMobile`, userInfos)
         if(result.data.status === "authenticated"){
+            setIsLoggedIn(true)
             await SecureStore.setItemAsync('accessToken', result.data.accessToken)
             navigation.navigate('Home')
         }
@@ -32,6 +33,17 @@ const Login = (props) => {
         setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    const backAction = () => {
+      navigation.navigate("Home"); // Navigate to specific screen on back button press
+      return true; // Prevent default back button behavior
+    };
+  
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+  
+    return () => backHandler.remove()
+    }, [navigation]);
 
   return (
     <ImageBackground source={require('../../../Utilities/Images/login_bg9.png')}>

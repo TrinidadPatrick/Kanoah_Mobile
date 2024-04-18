@@ -111,6 +111,15 @@ const AddServiceOffer = ({showAddServiceModal, setShowAddServiceModal, serviceOf
         setShowAddVariationModal(false)
     }
 
+    const deleteVariant = (uniqueId) => {
+        const newData = [...serviceOfferInfo.variants]
+        const index = newData.findIndex((variant) => variant.uniqueId === uniqueId)
+        if(newData.length !== 1)
+        {
+            newData.splice(index, 1)
+            setServiceOfferInfo({...serviceOfferInfo, variants : newData})
+        }
+    }
     return (
     <>
     {
@@ -200,7 +209,7 @@ const AddServiceOffer = ({showAddServiceModal, setShowAddServiceModal, serviceOf
                             <TextInput value={variation.type} onChangeText={(value)=>{handleInputVariationType(value, index)}} placeholderTextColor='lightgray' className="p-2 border border-gray-200 flex-1 rounded-md" placeholder="Type" />
                             <TextInput inputMode='numeric' value={variation.price} onChangeText={(value)=>{handleInputVariationPrice(value.replace(/[^0-9]/g, ''), index)}} placeholderTextColor='lightgray' className="p-2 border border-gray-200 flex-1 rounded-md" placeholder="Price" />
                             <TextInput inputMode='numeric' value={variation.duration} onChangeText={(value)=>{handleInputVariationDuration(value.replace(/[^0-9]/g, ''), index)}} placeholderTextColor='lightgray' className="p-2 border border-gray-200 flex-1 rounded-md" placeholder="Duration" />
-                            <TouchableOpacity className="flex-row items-center justify-center">
+                            <TouchableOpacity onPress={()=>deleteVariant(variation.uniqueId)} className="flex-row items-center justify-center">
                                 <Icon type='material-community' name='delete' color='red' />
                             </TouchableOpacity>
                         </View>

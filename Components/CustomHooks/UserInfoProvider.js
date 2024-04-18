@@ -33,11 +33,7 @@ const useInfo = () => {
       },[])
   
     )
-    
-    // useEffect(()=>{
-    
-    //       fetchUserProfile();
-    // },[])
+  
   return {
     userInformation, isLoggedIn, setIsLoggedIn
   }

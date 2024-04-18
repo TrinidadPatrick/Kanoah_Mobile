@@ -51,6 +51,7 @@
     "react-native-google-places-autocomplete": "^2.2.0",
     "react-native-image-viewing": "^0.2.2",
     "react-native-maps": "1.10.0",
+    "react-native-month-year-picker": "^1.9.0",
     "react-native-pager-view": "6.2.3",
     "react-native-picker-select": "^9.1.3",
     "react-native-ratings": "^8.1.0",

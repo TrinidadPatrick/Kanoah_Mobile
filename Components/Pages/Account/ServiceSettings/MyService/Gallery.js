@@ -149,15 +149,15 @@ const Gallery = ({galleryImages, setGalleryImages, galleryScrollViewRef, setShow
     setGalleryImages(filtered)
     setMultipleSelectEnable(false)
 
-    // await http.post('Mobile_deleteMultipleImages', {imageToDelete},{
-    //   headers : {
-    //     'Authorization' : `Bearer ${accessToken}`
-    //   }
-    // }).then((res)=>{
-    //   setImageToDelete([])
-    // }).catch((err)=>{
-    //   console.log(err)
-    // })
+    await http.post('Mobile_deleteMultipleImages', {imageToDelete},{
+      headers : {
+        'Authorization' : `Bearer ${accessToken}`
+      }
+    }).then((res)=>{
+      setImageToDelete([])
+    }).catch((err)=>{
+      console.log(err)
+    })
     }
 
   return (

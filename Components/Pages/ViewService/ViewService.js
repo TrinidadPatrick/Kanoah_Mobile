@@ -325,7 +325,10 @@ const ViewService = ({route, navigation}) => {
     
     {/* Chat and Book button */}
     <View  className="w-full h-[50] flex flex-row items-center justify-evenly bg-white absolute bottom-0">
-      <TouchableOpacity className="bg-blue-500 w-[30%] py-2 rounded-md">
+      <TouchableOpacity onPress={()=>navigation.navigate("ConversationWindow", {
+        serviceOwnerId : service.owner._id,
+        conversationId : null
+      })} className="bg-blue-500 w-[30%] py-2 rounded-md">
         <View style={{columnGap : 5}} className="flex flex-row items-center justify-center">
         <FontAwesome  name="comments" color="white" size={20} />
         <Text className="text-white w-fit text-center">Chat</Text>

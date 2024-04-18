@@ -9,7 +9,7 @@ import http from '../../../../../http';
 import { useNavigation } from '@react-navigation/native';
 
 const ClientInProgressBookings = ({navigation}) => {
-  const [inPressBookings, setInProgressBookings] = useState(null)
+  const [inProgressBookings, setInProgressBookings] = useState(null)
   const [socket, setSocket] = useState(null)
   const useNav = useNavigation(); 
 
@@ -70,20 +70,19 @@ const ClientInProgressBookings = ({navigation}) => {
   }
 
   const cancelBooking = async (bookingId, differenceInMinutes) => {
-    console.log(differenceInMinutes)
     if(differenceInMinutes <= 5)
     {
       const status = "CANCELLED"
-    const index = inPressBookings.findIndex(booking => booking._id === bookingId)
+    const index = inProgressBookings.findIndex(booking => booking._id === bookingId)
     if(index !== -1)
     {
-        const newBooking = [...inPressBookings]
+        const newBooking = [...inProgressBookings]
         newBooking[index] = {...newBooking[index], ["status"] : status}
         const filtered = newBooking.filter((booking) => booking.status === "INPROGRESS")
         setInProgressBookings(filtered)
         try {
             const result = await http.patch(`respondBooking/${bookingId}`, {status})
-            notifyUser(inPressBookings[index])
+            notifyUser(inProgressBookings[index])
         } catch (error) {
             console.log(error)
         }
@@ -110,7 +109,7 @@ const ClientInProgressBookings = ({navigation}) => {
   return (
     <View className="flex-1 bg-[#f9f9f9]">
     {
-      inPressBookings?.length === 0
+      inProgressBookings?.length === 0
       ?
       <View className="flex-1 flex-row justify-center items-center">
         <Text className="text-gray-500">No bookings yet</Text>
@@ -118,7 +117,7 @@ const ClientInProgressBookings = ({navigation}) => {
       :
       <FlatList
       className="mt-3"
-      data={inPressBookings?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))}
+      data={inProgressBookings?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))}
       keyExtractor={(item) => item._id}
       renderItem={({ item }) => {
       const differenceInMilliseconds = Math.abs(new Date() - new Date(item.createdAt));
