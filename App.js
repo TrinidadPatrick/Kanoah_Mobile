@@ -51,7 +51,6 @@ import ServiceCancelledBookings from './Components/Pages/Account/ServiceSettings
 import ServiceViewBookingDetails from './Components/Pages/Account/ServiceSettings/ServiceBookings/ServiceViewBookingDetails';
 import ServiceViewStaticBookingDetail from './Components/Pages/Account/ServiceSettings/ServiceBookings/ServiceViewStaticBookingDetail';
 import ServiceReviews from './Components/Pages/Account/ServiceSettings/ServiceReviews/ServiceReviews';
-import MainChat from './Components/Pages/Chat/MainChat';
 import socketStore from './socketStore';
 import ConversationWindow from './Components/Pages/Chat/ConversationWindow';
 import { io } from 'socket.io-client';
@@ -60,6 +59,9 @@ import useInfo from './Components/CustomHooks/UserInfoProvider';
 import * as SecureStore from 'expo-secure-store'
 import http from './http';
 import ContactLists from './Components/Pages/Chat/ContactLists';
+import Notifications from './Components/Pages/NotificationPage/Notifications';
+import serviceStore from './Stores/UserServiceStore';
+import ServiceDashboard from './Components/Pages/Account/ServiceSettings/ServiceDashboard/ServiceDashboard';
 
 export default function App() {
   
@@ -74,13 +76,11 @@ export default function App() {
   const HomeStackScreen = () => {
     const {socket, setSocket} = socketStore()
     const {userInformation, isLoggedIn, setIsLoggedIn} = useInfo()
+    const {service, setService} = serviceStore()
     const [unreadCounts, setUnreadCounts] = useState(0)
+    const [unreadNotifCounts, setUnreadNotifCounts] = useState(0)
 
-    useEffect(()=>{
-
-    },[])
-
-    const countUnreadNotifs = async () => {
+    const countUnreadChats = async () => {
       const accessToken = await SecureStore.getItemAsync('accessToken')
       try {
         const result = await http.get('Mobile_countUnreadMessages', {
@@ -94,10 +94,55 @@ export default function App() {
       }
     }
 
+    const countUnreadNotifs = async () => {
+      const accessToken = await SecureStore.getItemAsync("accessToken")
+      try {
+         const notifCount = await http.get('Mobile_countUnreadNotifs', {
+          headers : {'Authorization' : `Bearer ${accessToken}`}
+         })
+         setUnreadNotifCounts(notifCount.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
     useEffect(()=>{
         setSocket(io("https://kanoah.onrender.com"))
-        countUnreadNotifs()
+        countUnreadChats()
     },[])
+
+    // Gets the user service Information
+    useEffect(()=>{
+      const getServiceInformation = async () => {
+        const accessToken = await SecureStore.getItemAsync('accessToken')
+        if(accessToken)
+        {
+            try {
+                const result = await http.get('Mobile_getService', {
+                    headers : {
+                        'Authorization' : `Bearer ${accessToken}`,
+                        "Content-Type" : 'application/json'
+                    }
+                })
+
+                setService(result.data)
+            } catch (error) {
+                console.log(error)
+            }
+            return
+        }
+
+    }
+
+    isLoggedIn === true && getServiceInformation()
+    },[isLoggedIn])
+
+    useEffect(()=>{
+      if(isLoggedIn === true)
+      {
+        countUnreadNotifs()
+      }
+    },[isLoggedIn])
 
     // Set the user loggedIn in the socket
     useEffect(()=>{
@@ -116,8 +161,12 @@ export default function App() {
       socket?.on('message', (message)=>{
       if(message == 'newMessage')
         {
-          countUnreadNotifs()
+          countUnreadChats()
         }
+      else if(message == 'New_Booking')
+      {
+        countUnreadNotifs()
+      }
       })
     
       return () => {
@@ -164,11 +213,12 @@ export default function App() {
           >
           {()=><ContactLists userInformation={userInformation} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}
           </Tab.Screen>
-          <Tab.Screen name="Notifications" component={HomePage}
+          <Tab.Screen name="Notifications" component={Notifications}
           options={{ headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="bell" size={size} color={color} />
             ),
+            tabBarBadge : unreadNotifCounts > 0 ? unreadNotifCounts : null
           }}
           />
           <Tab.Screen name="Account" component={Account}
@@ -331,7 +381,7 @@ export default function App() {
       {/* Service Settings stack */}
       <Stack.Screen name="MyService" component={MyService} options={{ headerShown: true, headerTitle : "My Service" }} />
       <Stack.Screen name="ServiceReviews" component={ServiceReviews} options={{ headerShown: true, headerTitle : "Service reviews" }} />
-
+      <Stack.Screen name="ServiceDashboard" component={ServiceDashboard} options={{ headerShown: true, headerTitle : "Dashboard" }} />
       <Stack.Screen name="ConversationWindow" component={ConversationWindow} options={{ headerShown: true, headerTitle : "" }} />
       
       

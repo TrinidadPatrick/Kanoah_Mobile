@@ -21,6 +21,7 @@ const ViewAllGallery = ({route, navigation}) => {
     <View className="w-full h-full relative">
         <FlatList
         data={galleryImages}
+        keyExtractor={(item, index) =>index}
         renderItem={(item, index) => (
         <View className="w-[50%] aspect-square p-2  ">
             <TouchableOpacity onPress={() => {scrollToItem(item.index);setShowViewer(true)}} className="w-full h-full overflow-hidden rounded-xl bg-white">

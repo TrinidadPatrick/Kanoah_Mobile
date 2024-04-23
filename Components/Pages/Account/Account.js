@@ -8,34 +8,6 @@ import http from '../../../http';
 
 const Account = ({navigation}) => {
   const {isLoggedIn, userInformation, setIsLoggedIn} = useInfo()
-  const [serviceInfo, setServiceInfo] = useState(null)
-
-  useFocusEffect(
-    useCallback(()=>{
-      const getServiceInformation = async () => {
-        const accessToken = await SecureStore.getItemAsync('accessToken')
-        if(accessToken)
-        {
-            try {
-                const result = await http.get('Mobile_getService', {
-                    headers : {
-                        'Authorization' : `Bearer ${accessToken}`,
-                        "Content-Type" : 'application/json'
-                    }
-                })
-
-                setServiceInfo(result.data)
-            } catch (error) {
-                console.log(error)
-            }
-            return
-        }
-
-    }
-
-    getServiceInformation()
-    },[])
-  )
   
   const logout = async () => {
     try {
@@ -103,22 +75,22 @@ const Account = ({navigation}) => {
         {/* Options */}
         <View style={{rowGap : 20}} className="mt-5 flex flex-col">
             {/* Edit Profile */}
-            <TouchableOpacity className="flex flex-row items-center justify-between">
+            <TouchableOpacity onPress={()=>navigation.navigate("ServiceDashboard",{userInformation})} className="flex flex-row items-center justify-between">
             <Text className="font-medium text-gray-500">Dashboard</Text>
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>
             {/* Bookings */}
-            <TouchableOpacity onPress={()=>navigation.navigate("MyService",{userInformation, serviceInfo})} className="flex flex-row items-center justify-between">
+            <TouchableOpacity onPress={()=>navigation.navigate("MyService",{userInformation})} className="flex flex-row items-center justify-between">
             <Text className="font-medium text-gray-500">My Service</Text>
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>
             {/* Service Bookings */}
-            <TouchableOpacity onPress={()=>navigation.navigate("ServiceBookings", {serviceInfo})} className="flex flex-row items-center justify-between">
+            <TouchableOpacity onPress={()=>navigation.navigate("ServiceBookings")} className="flex flex-row items-center justify-between">
             <Text className="font-medium text-gray-500">Bookings</Text>
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>
             {/* Favorites */}
-            <TouchableOpacity onPress={()=>navigation.navigate("ServiceReviews", {serviceInfo})} className="flex flex-row items-center justify-between">
+            <TouchableOpacity onPress={()=>navigation.navigate("ServiceReviews")} className="flex flex-row items-center justify-between">
             <Text className="font-medium text-gray-500">Reviews</Text>
             <FontAwesome name="angle-right" size={25} color="black" />
             </TouchableOpacity>

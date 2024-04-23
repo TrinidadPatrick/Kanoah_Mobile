@@ -8,9 +8,10 @@ import {FontAwesome, Entypo} from 'react-native-vector-icons'
 import Gallery from './Gallery'
 import Featured from './Featured'
 import { useFocusEffect } from '@react-navigation/native'
+import serviceStore from '../../../../../Stores/UserServiceStore'
 
 const MyService = ({route, navigation}) => {
-    const serviceInformation = route.params.serviceInfo
+    const {service, setService} = serviceStore()
     const userInformation = route.params.userInformation
     const [serviceInfo, setServiceInfo] = useState(null)
     const [index, setIndex] = useState(0);
@@ -35,6 +36,7 @@ const MyService = ({route, navigation}) => {
                 })
 
                 setServiceInfo(result.data)
+                setService(result.data)
             } catch (error) {
                 console.log(error)
             }
@@ -86,7 +88,7 @@ const MyService = ({route, navigation}) => {
         navigation.setOptions({
             headerTitle : `${userInformation?.lastname}, ${userInformation.firstname}`
         })
-        setServiceInfo(serviceInformation)
+        setServiceInfo(service)
     },[])
 
     useEffect(()=>{

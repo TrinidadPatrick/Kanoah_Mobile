@@ -6,9 +6,10 @@ import { useFocusEffect } from '@react-navigation/native'
 import * as SecureStore from 'expo-secure-store'
 import {FontAwesome, Entypo} from 'react-native-vector-icons'
 import io from 'socket.io-client'
+import serviceStore from '../../../../../Stores/UserServiceStore'
 
 const ServiceInProgressBookings = ({route, navigation}) => {
-  const serviceInfo = route.params.serviceInfo
+  const {service} = serviceStore()
   const [inProgressBookings, setInProgressBookings] = useState(null)
   const [socket, setSocket] = useState(null)
 
@@ -22,7 +23,7 @@ const ServiceInProgressBookings = ({route, navigation}) => {
   const getInProgressBookings = async () => {
     try {
       const accessToken = await SecureStore.getItemAsync('accessToken')
-      const result = await http.get(`Mobile_getInProgressBooking/${serviceInfo._id}`, {
+      const result = await http.get(`Mobile_getInProgressBooking/${service._id}`, {
         headers : {
           'Authorization' : `Bearer ${accessToken}`
         }
@@ -91,7 +92,7 @@ const ServiceInProgressBookings = ({route, navigation}) => {
         try {
             const result = await http.patch(`respondBooking/${bookingId}`, {status, updatedAt : new Date(), cancelledBy : {
               role : 'Provider',
-              user : serviceInfo.userId
+              user : service.userId
             }})
             notifyUser(inProgressBookings[index])
         } catch (error) {
@@ -138,6 +139,13 @@ const ServiceInProgressBookings = ({route, navigation}) => {
             reference_id : booking._id
         })
         socket.emit('New_Notification', {notification : 'New_Booking', receiver : booking.client});
+        axios.post(`https://app.nativenotify.com/api/indie/notification`, {
+            subID: booking.client,
+            appId: 19825,
+            appToken: 'bY9Ipmkm8sFKbmXf7T0zNN',
+            title: `Cancelled Booking`,
+            message: `Your booking for ${booking.service.selectedService} on ${bookDate} at ${booking.schedule.bookingTime} has been cancelled by the service provider. Kindly review your GCash account for the refunded amount.`
+       });
     } catch (error) {
         console.error(error)
     }

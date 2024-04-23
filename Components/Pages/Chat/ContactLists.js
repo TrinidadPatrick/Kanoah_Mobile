@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, Image, TouchableOpacity, TextInput } from 'react-native'
 import { useCallback, useEffect, useState } from 'react'
 import React from 'react'
 import { useFocusEffect } from '@react-navigation/native'
@@ -12,7 +12,9 @@ import socketStore from '../../../socketStore'
 const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
     const {socket, setSocket} = socketStore()
     const navigation = useNavigation()
+    const [staticContactList, setStaticContactList] = useState(null)
     const [contactList, setContactList] = useState(null)
+    const [searchValue, setSearchValue] = useState('')
 
     // Triggers when there is a new message
     useEffect(()=>{
@@ -80,6 +82,7 @@ const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
                 }
             })
             setContactList(result.data)
+            setStaticContactList(result.data)
             const chatCount = await countUnreadNotifs()
             navigation.setOptions({
                 tabBarBadge : chatCount > 0 ? chatCount : null
@@ -125,9 +128,35 @@ const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
         })
     }
 
+    const handleSearch = () => {
+        // console.log(searchValue.toLowerCase())
+        if(searchValue === "")
+        {
+            setContactList(staticContactList)
+            return
+        }
+        else
+        {
+            const result = staticContactList.filter((contacts) =>
+            contacts.participants.some((participant) =>participant.firstname.trim().toLowerCase() === searchValue.trim().toLowerCase()) ||
+            contacts.participants.some((participant) =>participant.lastname.trim().toLowerCase() === searchValue.trim().toLowerCase()) ||
+            contacts.virtualServiceInquired.basicInformation.ServiceTitle.toLowerCase().includes(searchValue.toLowerCase())
+            );
+            setContactList(result)
+        }
+    }
+
     
   return (
-    <View className="flex-1 bg-white ">
+    <View className="flex-1 bg-white px-2 ">
+        {/* Search Input */}
+        <View className="py-2 px-2 my-4 bg-gray-100  rounded-full relative flex-row items-center">
+            <Icon type='material-community' name='magnify' color='gray' />
+            <TextInput onSubmitEditing={()=>handleSearch()} value={searchValue} onChangeText={(value)=>setSearchValue(value)} placeholderTextColor='gray' className="px-2 flex-1" placeholder='Search' />
+            {searchValue !== "" && <TouchableOpacity onPress={()=>{setSearchValue("");setContactList(staticContactList)}}>
+                <Icon type='material-community' name='close' color='gray' />
+            </TouchableOpacity>}
+        </View>
         <FlatList
         data={contactList}
         contentContainerStyle={{gap : 10}}
@@ -139,9 +168,10 @@ const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
             const dateNow = new Date().toLocaleDateString("EN-US", {month : 'short', day : '2-digit', year : 'numeric'})
             const messageDate = new Date(item.createdAt).toLocaleDateString("EN-US", {month : 'short', day : '2-digit', year : 'numeric'})
             return (
-                <TouchableOpacity onPress={()=>{if(!item.readBy.includes(userInformation._id)){handleReadMessage(item.conversationId)};navigation.navigate("ConversationWindow", {
+                <TouchableOpacity onPress={()=>{handleReadMessage(item.conversationId);navigation.navigate("ConversationWindow", {
                     serviceOwnerId : item.virtualServiceInquired.owner,
-                    conversationId : item.conversationId
+                    conversationId : item.conversationId,
+                    userInformation
                 })}} className="w-full flex-row p-1 space-x-3   ">
                     {/* Image profile */}
                     <View className="image-container w-12 rounded-full overflow-hidden aspect-square ">
@@ -163,7 +193,7 @@ const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
                             {
                                 item.messageType === "text" ? <Text numberOfLines={1} className={`${item.readBy.includes(userInformation._id) ? "font-normal" : "font-bold"} text-gray-600 text-sm`}>{receiver._id === item.messageContent.sender ? "You: " + item.messageContent.content : item.messageContent.content }</Text>
                                 :
-                                <Text numberOfLines={1} className="font-normal text-gray-600 text-sm">{receiver._id === item.messageContent.sender ? "You: Photo" : "Photo" }</Text>
+                                <Text numberOfLines={1} className={`${item.readBy.includes(userInformation._id) ? "font-normal" : "font-bold"} text-gray-600 text-sm`}>{receiver._id === item.messageContent.sender ? "You: Photo" : "Photo" }</Text>
                             }
                         </View>
                     </View>

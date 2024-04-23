@@ -76,7 +76,7 @@ const EditServiceOffer = ({showEditServiceModal, setShowEditServiceModal, servic
         const Instance = [...serviceOfferList]
         const index = Instance.findIndex((serviceOffer) => serviceOffer.uniqueId === serviceOfferInfo.uniqueId)
         const tempData = {
-          uniqueId : Math.floor(1000000000 + Math.random() * 9000000000),
+          uniqueId : serviceOfferInfo.uniqueId,
           name : serviceOfferInfo.name,
           origPrice : serviceOfferInfo.variants.length !== 0 ? '' : serviceOfferInfo.origPrice,
           duration : serviceOfferInfo.variants.length !== 0 ? '' : serviceOfferInfo.duration,

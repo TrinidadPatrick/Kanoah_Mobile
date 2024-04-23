@@ -39,7 +39,7 @@ const HomePage = (props) => {
       </View>
 
       {/* Search bar */}
-      <View className="w-full rounded-md">
+      {/* <View className="w-full rounded-md">
         <SearchBar containerStyle={{
           backgroundColor: 'white', // set background color to transparent
           borderWidth: 2,  
@@ -58,7 +58,7 @@ const HomePage = (props) => {
          lightTheme>
 
         </SearchBar>
-      </View>
+      </View> */}
       
       {/* Top Rated Services */}
       <View className="w-full">

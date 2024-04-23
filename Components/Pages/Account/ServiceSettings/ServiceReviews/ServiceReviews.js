@@ -6,10 +6,11 @@ import * as SecureStore from 'expo-secure-store'
 import ReportsAndSummary from './ReportsAndSummary'
 import ServiceReviewList from './ServiceReviewList'
 import MonthPickerCS from './MonthPicker'
+import serviceStore from '../../../../../Stores/UserServiceStore'
 
 const ServiceReviews = ({route, navigation}) => {
     const months = ["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
-    const {serviceInfo} = route.params
+    const {service} = serviceStore()
     const [ratingList, setRatingList] = useState(null)
     const currentDate = new Date();
     const year = currentDate.getFullYear();
@@ -23,7 +24,7 @@ const ServiceReviews = ({route, navigation}) => {
         if(accessToken)
         {
             try {
-                const result = await http.get(`Mobile_getServiceRatingWithFilter?service=${serviceInfo._id}&dateFilter=${dateSelected}`, {
+                const result = await http.get(`Mobile_getServiceRatingWithFilter?service=${service._id}&dateFilter=${dateSelected}`, {
                     headers : {
                         'Authorization' : `Bearer ${accessToken}`
                     }
@@ -36,10 +37,10 @@ const ServiceReviews = ({route, navigation}) => {
     }
   
     useEffect(()=>{
-        if(serviceInfo !== null){
+        if(service !== null){
           getRatings()
         }
-    },[serviceInfo, dateSelected])
+    },[service, dateSelected])
 
     const convertToMonthString = (date) => {
         const year = date.split("-")[0]
@@ -56,7 +57,7 @@ const ServiceReviews = ({route, navigation}) => {
       <TouchableOpacity onPress={()=>setShowMonthPicker(true)} className="mt-5 border-[1px] border-gray-300 w-[150] flex-row items-center justify-between rounded-md overflow-hidden bg-white">
             <Text style={{fontSize : 13}} className="px-2">{convertToMonthString(dateSelected)}</Text>
             <Icon color='gray' className=" p-1" type='material-community' name='calendar-blank-outline' size={23} />
-        </TouchableOpacity>
+      </TouchableOpacity>
       <ServiceReviewList ratingList={ratingList} />
     </View>
   )

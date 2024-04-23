@@ -1,7 +1,7 @@
 import { View, Text, TextInput, Image, BackHandler, Pressable, ImageBackground } from 'react-native'
 import React from 'react'
 import { useState, useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { registerIndieID, unregisterIndieDevice } from 'native-notify';
 import {FontAwesome} from '@expo/vector-icons'
 import http from '../../../http';
 import useInfo from '../../CustomHooks/UserInfoProvider';
@@ -18,11 +18,13 @@ const Login = (props) => {
     const [invalidLogin, setInvalidLogin] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
+
   const signin = async () => {
     setIsLoading(true)
     try {
         const result = await http.post(`loginMobile`, userInfos)
         if(result.data.status === "authenticated"){
+            registerIndieID(result.data.userId, 19825, 'bY9Ipmkm8sFKbmXf7T0zNN');
             setIsLoggedIn(true)
             await SecureStore.setItemAsync('accessToken', result.data.accessToken)
             navigation.navigate('Home')

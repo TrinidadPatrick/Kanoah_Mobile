@@ -3,16 +3,17 @@ import React, { useCallback, useState } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
 import * as SecureStore from 'expo-secure-store'
 import http from '../../../../../http'
+import serviceStore from '../../../../../Stores/UserServiceStore'
 
 const ServiceCompletedBookings = ({route, navigation}) => {
-  const serviceInfo = route.params.serviceInfo
+  const {service} = serviceStore()
   const [completedBookings, setCompletedBookings] = useState(null)
   
 
   const getCompletedBookings = async () => {
     try {
       const accessToken = await SecureStore.getItemAsync('accessToken')
-      const result = await http.get(`Mobile_getCompletedBooking/${serviceInfo._id}`, {
+      const result = await http.get(`Mobile_getCompletedBooking/${service._id}`, {
         headers : {
           'Authorization' : `Bearer ${accessToken}`
         }

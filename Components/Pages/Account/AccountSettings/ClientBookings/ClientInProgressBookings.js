@@ -64,6 +64,13 @@ const ClientInProgressBookings = ({navigation}) => {
             reference_id : booking._id
         })
         socket.emit('New_Notification', {notification : 'New_Booking', receiver : booking.shop.owner});
+        axios.post(`https://app.nativenotify.com/api/indie/notification`, {
+            subID: booking.shop.owner,
+            appId: 19825,
+            appToken: 'bY9Ipmkm8sFKbmXf7T0zNN',
+            title: `Cancelled Booking`,
+            message: `Booking for ${booking.service.selectedService} on ${bookDate} at ${booking.schedule.bookingTime} has been cancelled by the client`
+       });
     } catch (error) {
         console.error(error)
     }

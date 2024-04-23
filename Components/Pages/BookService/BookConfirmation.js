@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import useBookingStore from './BookServiceStore'
 import {FontAwesome, Entypo, Octicons} from 'react-native-vector-icons'
 import http from '../../../http'
+import axios from 'axios'
 import io from 'socket.io-client';
 
 const windowHeight = Dimensions.get('window').height;
@@ -97,6 +98,13 @@ const BookConfirmation = ({route, navigation}) => {
                 {
                     notifyUser(result.data._id, receiver) //insert notification in the database
                     socket.emit('New_Notification', {notification : 'New_Booking', receiver : receiver}); //notify user theres a new booking
+                    axios.post(`https://app.nativenotify.com/api/indie/notification`, {
+                    subID: receiver,
+                    appId: 19825,
+                    appToken: 'bY9Ipmkm8sFKbmXf7T0zNN',
+                    title: `New booking`,
+                    message: 'You have a new booking'
+                    });
                 }
             } catch (error) {
                 alert(error)

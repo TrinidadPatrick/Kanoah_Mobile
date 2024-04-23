@@ -15,6 +15,7 @@ import ServiceSchedule from './ServiceSchedule';
 import ServiceGallery from './ServiceGallery';
 import useBookingStore from '../BookService/BookServiceStore'
 import { useFocusEffect } from '@react-navigation/native';
+import ServiceFullAddress from './ServiceFullAddress';
 
 
 const ViewService = ({route, navigation}) => {
@@ -317,6 +318,12 @@ const ViewService = ({route, navigation}) => {
       </View>
       </View>
 
+      {/* Full Adress */}
+      <View  className="flex- h-[300] py-2 px-3">
+        <Text className="text-sm font-medium mb-0">Location</Text>
+        <ServiceFullAddress address={service?.address} />
+      </View>
+
       </View>
     }
       
@@ -327,7 +334,8 @@ const ViewService = ({route, navigation}) => {
     <View  className="w-full h-[50] flex flex-row items-center justify-evenly bg-white absolute bottom-0">
       <TouchableOpacity onPress={()=>navigation.navigate("ConversationWindow", {
         serviceOwnerId : service.owner._id,
-        conversationId : null
+        conversationId : null,
+        userInformation
       })} className="bg-blue-500 w-[30%] py-2 rounded-md">
         <View style={{columnGap : 5}} className="flex flex-row items-center justify-center">
         <FontAwesome  name="comments" color="white" size={20} />

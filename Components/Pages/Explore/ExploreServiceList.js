@@ -12,25 +12,25 @@ const ExploreServiceList = ({serviceList, categories, subCategories, loading, se
 
 
     const handleRefresh = async () => {
-        // setRefreshing(true)
-        // try {
-        //     const result = await http.get(`Mobile_GetServicesByFilter?category=${selectedFilterState.category.category_id}&subCategory=${selectedFilterState.subCategory.subCategory_id}&ratings=${selectedFilterState.ratings}&search=${selectedFilterState.searchValue}`)
-        //     setServiceList(result.data.services)
-        // } catch (error) {
-        //     console.log(error)
-        // } finally {
-        //     setRefreshing(false)
-        // }
+        setRefreshing(true)
+        try {
+            const result = await http.get(`Mobile_GetServicesByFilter?category=${selectedFilterState.category.category_id}&subCategory=${selectedFilterState.subCategory.subCategory_id}&ratings=${selectedFilterState.ratings}&search=${selectedFilterState.searchValue}&latitude=${selectedFilterState?.coordinates.latitude}&longitude=${selectedFilterState?.coordinates.longitude}&radius=${selectedFilterState?.radius}`)
+            console.log(result.data.services)
+            setServiceList(result.data.services)
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setRefreshing(false)
+        }
     }
 
-
   return (
-    <View className="flex items-center h-full justify-center py-2">
+    <View className="flex-1  h-full justify-center py-2">
 
 
     {
-        loading ? 
-        <View className={`flex flex-col`}>
+        loading && serviceList === null ? 
+        <View className={`flex-1 flex-col`}>
         <ScrollView showsHorizontalScrollIndicator={false} contentContainerStyle={{display : 'flex', flexDirection : 'row', flexWrap : 'wrap'}} className="gap-3">
         {
             Array.from({length : 10}, (_, index)=>(
@@ -47,10 +47,20 @@ const ExploreServiceList = ({serviceList, categories, subCategories, loading, se
         </ScrollView>
         </View>
         :
+        serviceList?.length === 0
+        ?
+        <View className="flex-1 flex-row justify-center items-center">
+            <Text>No results</Text>
+        </View>
+        :
         (
        <ScrollView
-       showsVerticalScrollIndicator={false} 
-        contentContainerStyle={{ display : 'flex', flexDirection : 'row',flexWrap : 'wrap', justifyContent : 'space-between', rowGap : 15}}
+       refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+       showsVerticalScrollIndicator={false}
+       style={{ flex : 1}} 
+       contentContainerStyle={{ flexDirection : 'row', flexWrap : 'wrap', justifyContent : 'space-between', rowGap : 15}}
        >
         {
              serviceList?.map((service)=>{
@@ -75,8 +85,7 @@ const ExploreServiceList = ({serviceList, categories, subCategories, loading, se
                 )
             })
         }
-        </ScrollView>
-
+       </ScrollView>
         )
     }
     

@@ -87,7 +87,6 @@ const Explore = ({navigation}) => {
     handleSort(selectedSortingOption, result.data.services)
   }
 
-  console.log(tabBarHeight.toFixed(0))
 
   return (
     <View className="w-full h-[100%] flex flex-col justify-start ">

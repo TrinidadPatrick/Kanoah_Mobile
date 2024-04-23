@@ -201,7 +201,7 @@ const ServiceViewBookingDetails = ({route, navigation}) => {
         <Text className="font-medium text-gray-900">+63{bookingInformation.contactAndAddress.contact}</Text>
         </View>
         {/* Address */}
-        <TouchableOpacity onPress={()=>{Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${bookingInformation.contactAndAddress.Address.latitude},${bookingInformation.contactAndAddress.Address.longitude}`)}} className="flex-col px-2 py-3 border-b-[1px] border-gray-100">
+        <View onPress={()=>{Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${bookingInformation.contactAndAddress.Address.latitude},${bookingInformation.contactAndAddress.Address.longitude}`)}} className="flex-col px-2 py-3 border-b-[1px] border-gray-100">
         <Text className="font-medium text-gray-600">Address</Text>
         <Text className="font-medium text-gray-900">{
         bookingInformation.contactAndAddress.Address.barangay.name + " " +
@@ -210,7 +210,7 @@ const ServiceViewBookingDetails = ({route, navigation}) => {
         bookingInformation.contactAndAddress.Address.region.name
         }</Text>
         <Text className="font-medium text-gray-900">{bookingInformation.contactAndAddress.Address.street}</Text>
-        </TouchableOpacity>
+        </View>
 
         {/* Account */}
         <View className="flex-col px-2 py-3 ">
