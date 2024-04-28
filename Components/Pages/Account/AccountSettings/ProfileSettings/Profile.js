@@ -310,7 +310,7 @@ const Profile = ({navigation}) => {
             <TouchableOpacity onPress={()=>navigation.navigate('ChangePasswordProfile', {_id : profile._id})} style={{ alignSelf: 'center', paddingHorizontal: 15, paddingVertical : 10, shadowColor: '#171717'}} className="flex rounded-sm flex-row items-center bg-gray-50 border-[1px] border-gray-100">
                 <Text className="font-medium text-xs text-gray-500">Change password</Text>
             </TouchableOpacity>
-            <TouchableOpacity  style={{ alignSelf: 'center', paddingHorizontal: 15, paddingVertical : 10, shadowColor: '#171717'}} className="flex rounded-sm flex-row items-center ">
+            <TouchableOpacity onPress={()=>navigation.navigate("DeactivateAccount", {_id : profile._id})} style={{ alignSelf: 'center', paddingHorizontal: 15, paddingVertical : 10, shadowColor: '#171717'}} className="flex rounded-sm flex-row items-center ">
                 <Text className="font-medium text-xs text-red-500">Deactivate Account</Text>
             </TouchableOpacity>
             </View>

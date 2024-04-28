@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import { StatusBar as MainStatusbar } from 'expo-status-bar';
 import { StyleSheet, Text, View, StatusBar, TouchableOpacity ,Linking, Button } from 'react-native';
-import { NavigationContainer, useNavigation, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, useNavigation, DarkTheme, useFocusEffect } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -54,7 +54,7 @@ import ServiceReviews from './Components/Pages/Account/ServiceSettings/ServiceRe
 import socketStore from './socketStore';
 import ConversationWindow from './Components/Pages/Chat/ConversationWindow';
 import { io } from 'socket.io-client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import useInfo from './Components/CustomHooks/UserInfoProvider';
 import * as SecureStore from 'expo-secure-store'
 import http from './http';
@@ -62,6 +62,9 @@ import ContactLists from './Components/Pages/Chat/ContactLists';
 import Notifications from './Components/Pages/NotificationPage/Notifications';
 import serviceStore from './Stores/UserServiceStore';
 import ServiceDashboard from './Components/Pages/Account/ServiceSettings/ServiceDashboard/ServiceDashboard';
+import authStore from './Stores/AuthState';
+import DeactivateAccount from './Components/Pages/Account/AccountSettings/ProfileSettings/DeactivateAccount';
+import ReportService from './Components/Pages/ViewService/ReportService';
 
 export default function App() {
   
@@ -75,6 +78,7 @@ export default function App() {
   // Components for home
   const HomeStackScreen = () => {
     const {socket, setSocket} = socketStore()
+    const {authState, setAuthState} = authStore()
     const {userInformation, isLoggedIn, setIsLoggedIn} = useInfo()
     const {service, setService} = serviceStore()
     const [unreadCounts, setUnreadCounts] = useState(0)
@@ -106,10 +110,28 @@ export default function App() {
       }
     }
 
+    useFocusEffect(
+      useCallback(()=>{
+        if(isLoggedIn === true)
+        {
+          setAuthState('loggedIn')
+        }
+        else if(isLoggedIn === false)
+        {
+          setAuthState('loggedOut')
+        }
+        return () => {
+        }
+      }, [isLoggedIn])
+    )
+
     useEffect(()=>{
+        if(authState === 'loggedIn')
+        {
         setSocket(io("https://kanoah.onrender.com"))
         countUnreadChats()
-    },[])
+        }
+    },[authState])
 
     // Gets the user service Information
     useEffect(()=>{
@@ -124,8 +146,12 @@ export default function App() {
                         "Content-Type" : 'application/json'
                     }
                 })
-
-                setService(result.data)
+                if(result.data.service === "Not registered")
+                {
+                  setService(null)
+                  return
+                }
+                setService(result.data.service)
             } catch (error) {
                 console.log(error)
             }
@@ -134,19 +160,19 @@ export default function App() {
 
     }
 
-    isLoggedIn === true && getServiceInformation()
-    },[isLoggedIn])
+    authState === "loggedIn" && getServiceInformation()
+    },[authState])
 
     useEffect(()=>{
-      if(isLoggedIn === true)
+      if(authState === "loggedIn")
       {
         countUnreadNotifs()
       }
-    },[isLoggedIn])
+    },[authState])
 
     // Set the user loggedIn in the socket
     useEffect(()=>{
-      if(isLoggedIn && userInformation !== null)
+      if(authState === "loggedIn" && userInformation !== null)
       {
         socket?.emit('loggedUser', userInformation?._id)
         
@@ -154,7 +180,7 @@ export default function App() {
             socket?.emit('disconnectUser', userInformation?._id)
         }
       }
-    },[socket, userInformation, isLoggedIn])
+    },[socket, userInformation, authState])
 
     // Notify user if there is new message
     useEffect(()=>{
@@ -359,6 +385,7 @@ export default function App() {
       <Stack.Screen name="NewPassword" component={NewPassword} options={{ headerShown: true, headerTitle : "Enter New Password" }} />
       <Stack.Screen name="ChangePasswordProfile" component={ChangePasswordProfile} options={{ headerShown: true, headerTitle : "Change Password" }} />
       <Stack.Screen name="ViewService" component={ViewService} options={{ headerShown: true, headerTitle : "", headerTransparent : true, headerTintColor : "white" }} />
+      <Stack.Screen name="ReportService" component={ReportService} options={{ headerTransparent : false, headerShown : true }} />
       <Stack.Screen name="ServiceViewBookingDetails" component={ServiceViewBookingDetails} options={{ headerShown: true, headerTitle : "Booking details", headerTransparent : false, headerTintColor : "black" }} />
       <Stack.Screen name="ServiceViewStaticBookingDetail" component={ServiceViewStaticBookingDetail} options={{ headerShown: true, headerTitle : "Booking details", headerTransparent : false, headerTintColor : "black" }} />
       <Stack.Screen name="ViewAllRatings" component={ViewAllRatings} options={{ headerShown: true, headerTitle : "Ratings" }} />
@@ -373,6 +400,7 @@ export default function App() {
 
       {/* Account Settings stack */}
       <Stack.Screen name="Profile" component={Profile} options={{ headerShown: true, headerTitle : "Edit Profile" }} />
+      <Stack.Screen name="DeactivateAccount" component={DeactivateAccount} options={{ headerShown: true, headerTitle : "Account deactivation" }} />
       <Stack.Screen name="AddressSetup" component={AddressSetup} options={{ headerShown: true, headerTitle : "Address" }} />
       <Stack.Screen name="MapFullScreen" component={MapFullScreen} options={{ headerShown: true, headerTitle : "Pin Location" }} />
       <Stack.Screen name="BlockedServices" component={BlockedServices} options={{ headerShown: true, headerTitle : "Blocked services " }} />

@@ -102,7 +102,7 @@ const ConversationWindow = ({route}) => {
                                         {conversationData.headerImage && <Image source={{ uri : conversationData.headerImage}} style={{width : "100%", height : "100%"}} className="rounded-full" />}
                                         {/* <RenderImage url={conversationData.headerImage} firstname={conversationData.entity.firstname} lastname={conversationData.entity.lastname} /> */}
                                     </View>
-                                    <View className="flex-col">
+                                    <View className="flex-col flex-1">
                                     <Text numberOfLines={1} className="font-medium text-gray-800 text-base">{conversationData.headerTitle}</Text>
                                     {onlineUsers.some((user)=> user.username === conversationData.entity._id) ? <Text className="text-green-400">Online</Text> : <Text>Offline</Text>}
                                     </View>

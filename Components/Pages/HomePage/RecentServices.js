@@ -5,7 +5,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import {FontAwesome} from '@expo/vector-icons'
 import { Rating } from '@kolking/react-native-rating';
 import { Skeleton } from '@rneui/themed';
-import { Image } from '@rneui/themed'
+import { Image } from 'react-native-elements'
 
 const RecentServices = ({services, navigation}) => {
     const [loading, setLoading] = useState(false)
@@ -72,11 +72,17 @@ const RecentServices = ({services, navigation}) => {
         {
           services?.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map((service, index) => {
             return (
-              <TouchableOpacity onPress={()=>navigation.navigate('ViewService', {serviceId : service._id})} key={service._id} className=" flex flex-col items-center ">
-                <Image  containerStyle={{width: "100%", height : 100, objectFit : "cover", borderRadius : 10}} source={{uri : service.serviceProfileImage}} /> 
-                <View className="w-full mt-1.5">
-                <Rating baseColor='#f2f2f2' size={15} rating={Number(service.ratings)} spacing={5} disabled />
-              <Text className="text-gray-400 font-medium text-xs mt-1">{service.ratings}({service.totalReviews})</Text>
+              <TouchableOpacity onPress={()=>navigation.navigate('ViewService', {serviceId : service._id})} key={service?._id} className=" flex flex-col items-center ">
+                {
+                  service.serviceProfileImage !== null
+                  ?
+                  <Image  containerStyle={{width: 100, height : 100, objectFit : "cover", borderRadius : 10}} source={{uri : service?.serviceProfileImage}} /> 
+                  :
+                  <Image  containerStyle={{width: 100, height : 100, objectFit : "cover", borderRadius : 10}} source={require('../../../Utilities/Images/emptyImage.jpg')} /> 
+                }
+                  <View className="w-full mt-1.5">
+                  <Rating baseColor='#f2f2f2' size={15} rating={Number(service.ratings)} spacing={5} disabled />
+                  <Text className="text-gray-400 font-medium text-xs mt-1">{service?.ratings} ({service?.totalReviews})</Text>
                 </View>
               </TouchableOpacity>
             )

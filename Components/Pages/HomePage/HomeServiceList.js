@@ -15,7 +15,14 @@ const HomeServiceList = ({services, navigation}) => {
                 // <TouchableOpacity >
                 <TouchableWithoutFeedback onPress={()=>navigation.navigate('ViewService', {serviceId : service._id})} key={service._id} >
                 <View className="w-[48%] flex flex-col justify-start overflow-hidden bg-white rounded-md shadow-sm" >
-                <Image style={{width : "100%", height : 150, objectFit : "cover"}} source={{uri : service.serviceProfileImage }} />
+                {
+                  service.serviceProfileImage !== null
+                  ?
+                  <Image  containerStyle={{width : "100%", height : 150, objectFit : "cover"}} source={{uri : service?.serviceProfileImage}} /> 
+                  :
+                  <Image  containerStyle={{width : "100%", height : 150, objectFit : "cover"}} source={require('../../../Utilities/Images/emptyImage.jpg')} /> 
+                }
+                {/* <Image style={{width : "100%", height : 150, objectFit : "cover"}} source={{uri : service.serviceProfileImage }} /> */}
                 <View className="w-full p-2">
                 {/* Service Title */}
                 <Text numberOfLines={1} className="relative text-gray-800 font-medium">{service.basicInformation.ServiceTitle}</Text>

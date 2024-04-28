@@ -13,7 +13,7 @@ import serviceStore from '../../../../../Stores/UserServiceStore'
 const MyService = ({route, navigation}) => {
     const {service, setService} = serviceStore()
     const userInformation = route.params.userInformation
-    const [serviceInfo, setServiceInfo] = useState(null)
+    const [serviceInfo, setServiceInfo] = useState(service)
     const [index, setIndex] = useState(0);
     const galleryScrollViewRef = useRef(null);
     const featuredScrollViewRef = useRef(null);
@@ -35,8 +35,8 @@ const MyService = ({route, navigation}) => {
                     }
                 })
 
-                setServiceInfo(result.data)
-                setService(result.data)
+                setServiceInfo(result.data.service)
+                setService(result.data.service)
             } catch (error) {
                 console.log(error)
             }

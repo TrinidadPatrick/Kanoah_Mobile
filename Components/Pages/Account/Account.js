@@ -1,29 +1,40 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, Linking } from 'react-native'
 import React, { useCallback, useState } from 'react'
 import {FontAwesome, Entypo} from 'react-native-vector-icons'
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from '@react-navigation/native';
 import useInfo from '../../CustomHooks/UserInfoProvider';
+import { registerIndieID, unregisterIndieDevice } from 'native-notify';
 import http from '../../../http';
+import authStore from '../../../Stores/AuthState';
+import axios from 'axios';
+import serviceStore from '../../../Stores/UserServiceStore';
 
 const Account = ({navigation}) => {
+  const {service} = serviceStore()
+  const {authState, setAuthState} = authStore()
   const {isLoggedIn, userInformation, setIsLoggedIn} = useInfo()
   
   const logout = async () => {
     try {
       await SecureStore.deleteItemAsync("accessToken")
-      setIsLoggedIn(null)
+      unregisterIndieDevice(userInformation._id, 19825, 'bY9Ipmkm8sFKbmXf7T0zNN');
+      axios.delete(`https://app.nativenotify.com/api/app/indie/sub/19825/bY9Ipmkm8sFKbmXf7T0zNN/${userInformation._id}`)
+      setAuthState("loggedOut")
+      setIsLoggedIn(false)
       navigation.navigate("Home")
     } catch (error) {
       console.log(error)
     }
   }
 
+
+
   return (
     <View className="bg-white h-full flex flex-col px-5 py-5 relative">
       <Text className="text-4xl font-medium">Settings</Text>
       {
-        isLoggedIn === false ? 
+        authState === "loggedOut" ? 
         <View className="w-full h-full flex flex-row justify-center items-center">
           <TouchableOpacity onPress={()=>{navigation.navigate("Login");setIsLoggedIn(null)}} className="bg-themeOrange px-4 py-2 rounded-sm">
             <Text className="text-white">Login</Text>
@@ -73,29 +84,40 @@ const Account = ({navigation}) => {
         </View>
         
         {/* Options */}
-        <View style={{rowGap : 20}} className="mt-5 flex flex-col">
-            {/* Edit Profile */}
-            <TouchableOpacity onPress={()=>navigation.navigate("ServiceDashboard",{userInformation})} className="flex flex-row items-center justify-between">
-            <Text className="font-medium text-gray-500">Dashboard</Text>
-            <FontAwesome name="angle-right" size={25} color="black" />
+        {
+          service === null?
+          <View className="h-[250] flex-col items-center justify-center space-y-2">
+            <Text className="font-medium text-gray-600">You are currently not registered to a service</Text>
+            <TouchableOpacity onPress={()=>{Linking.openURL('https://web-based-service-finder.vercel.app/serviceRegistration')}} className="bg-gray-50 px-3 py-2">
+              <Text>Add service</Text>
             </TouchableOpacity>
-            {/* Bookings */}
-            <TouchableOpacity onPress={()=>navigation.navigate("MyService",{userInformation})} className="flex flex-row items-center justify-between">
-            <Text className="font-medium text-gray-500">My Service</Text>
-            <FontAwesome name="angle-right" size={25} color="black" />
-            </TouchableOpacity>
-            {/* Service Bookings */}
-            <TouchableOpacity onPress={()=>navigation.navigate("ServiceBookings")} className="flex flex-row items-center justify-between">
-            <Text className="font-medium text-gray-500">Bookings</Text>
-            <FontAwesome name="angle-right" size={25} color="black" />
-            </TouchableOpacity>
-            {/* Favorites */}
-            <TouchableOpacity onPress={()=>navigation.navigate("ServiceReviews")} className="flex flex-row items-center justify-between">
-            <Text className="font-medium text-gray-500">Reviews</Text>
-            <FontAwesome name="angle-right" size={25} color="black" />
-            </TouchableOpacity>
-            
-        </View>
+          </View>
+
+          :
+          <View style={{rowGap : 20}} className="mt-5 flex flex-col">
+          {/* Edit Profile */}
+          <TouchableOpacity onPress={()=>navigation.navigate("ServiceDashboard",{userInformation})} className="flex flex-row items-center justify-between">
+          <Text className="font-medium text-gray-500">Dashboard</Text>
+          <FontAwesome name="angle-right" size={25} color="black" />
+          </TouchableOpacity>
+          {/* Bookings */}
+          <TouchableOpacity onPress={()=>navigation.navigate("MyService",{userInformation})} className="flex flex-row items-center justify-between">
+          <Text className="font-medium text-gray-500">My Service</Text>
+          <FontAwesome name="angle-right" size={25} color="black" />
+          </TouchableOpacity>
+          {/* Service Bookings */}
+          <TouchableOpacity onPress={()=>navigation.navigate("ServiceBookings")} className="flex flex-row items-center justify-between">
+          <Text className="font-medium text-gray-500">Bookings</Text>
+          <FontAwesome name="angle-right" size={25} color="black" />
+          </TouchableOpacity>
+          {/* Favorites */}
+          <TouchableOpacity onPress={()=>navigation.navigate("ServiceReviews")} className="flex flex-row items-center justify-between">
+          <Text className="font-medium text-gray-500">Reviews</Text>
+          <FontAwesome name="angle-right" size={25} color="black" />
+          </TouchableOpacity>
+          
+      </View>
+        }
       </View>
 
 

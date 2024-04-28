@@ -67,7 +67,14 @@ const ExploreServiceList = ({serviceList, categories, subCategories, loading, se
                 return (
                     <TouchableOpacity onPress={()=>navigation.navigate('ViewService', {serviceId : service._id})} key={service._id} className="w-[48%] flex flex-col justify-start relative overflow-hidden bg-white rounded-md shadow-sm">
                         <Text className="absolute  z-10 bg-themeOrange py-1 px-2 text-xs text-white rounded-full top-1 left-1">{categories?.find((category) => category?._id === service.advanceInformation.ServiceCategory).name}</Text>
-                    <Image style={{width : "100%", height : 150, objectFit : "cover"}} source={{uri : service.serviceProfileImage }} />
+                        {
+                        service.serviceProfileImage !== null
+                        ?
+                        <Image  containerStyle={{width : "100%", height : 150, objectFit : "cover"}} source={{uri : service?.serviceProfileImage}} /> 
+                        :
+                        <Image  containerStyle={{width : "100%", height : 150, objectFit : "cover"}} source={require('../../../Utilities/Images/emptyImage.jpg')} /> 
+                        }
+                    {/* <Image style={{width : "100%", height : 150, objectFit : "cover"}} source={{uri : service.serviceProfileImage }} /> */}
                     <View className="w-full p-2">
                     {/* Service Title */}
                     <Text numberOfLines={1} className="relative text-gray-800 font-medium">{service.basicInformation.ServiceTitle}</Text>

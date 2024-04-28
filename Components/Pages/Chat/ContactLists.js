@@ -7,9 +7,11 @@ import http from '../../../http'
 import { Icon } from 'react-native-elements'
 import { useNavigation } from '@react-navigation/native'
 import socketStore from '../../../socketStore'
+import authStore from '../../../Stores/AuthState'
 
 
 const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
+    const {authState, setAuthState} = authStore()
     const {socket, setSocket} = socketStore()
     const navigation = useNavigation()
     const [staticContactList, setStaticContactList] = useState(null)
@@ -36,15 +38,15 @@ const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
     // Redirect to login page if not logged in
     useFocusEffect(
         useCallback(()=>{
-            if(isLoggedIn === false)
+            if(authState === "loggedOut")
             {
-                setIsLoggedIn(null)
+                setContactList([])
                 navigation.navigate("Login")
             }
             return () => {
             
             }
-        },[isLoggedIn])
+        },[authState])
 
     )
 
@@ -157,7 +159,10 @@ const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
                 <Icon type='material-community' name='close' color='gray' />
             </TouchableOpacity>}
         </View>
-        <FlatList
+        {
+            authState === "loggedIn"
+            &&
+            <FlatList
         data={contactList}
         contentContainerStyle={{gap : 10}}
         keyExtractor={(item) => item._id}
@@ -209,6 +214,7 @@ const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
             )
         }}
         />
+        }
     </View>
   )
 }

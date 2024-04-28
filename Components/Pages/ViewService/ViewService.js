@@ -1,5 +1,6 @@
-import { View, Text, Image, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback, FlatList, Share, Linking, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback, FlatList, Share, Linking, Dimensions } from 'react-native'
 import React from 'react'
+import { Image } from 'react-native-elements';
 import { StatusBar as MainStatusbar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react'
 import { useState } from 'react'
@@ -16,9 +17,11 @@ import ServiceGallery from './ServiceGallery';
 import useBookingStore from '../BookService/BookServiceStore'
 import { useFocusEffect } from '@react-navigation/native';
 import ServiceFullAddress from './ServiceFullAddress';
+import authStore from '../../../Stores/AuthState';
 
 
 const ViewService = ({route, navigation}) => {
+    const {authState, setAuthState} = authStore()
     const {storeBookingInformation} = useBookingStore()
     const {serviceId} = route.params
     const [service, setService] = useState(null)
@@ -29,9 +32,11 @@ const ViewService = ({route, navigation}) => {
     const pagerRef = useRef(null);
     const {userInformation, isLoggedIn} = useInfo()
     const [user, setUser] = useState(null)
+    const [serviceNotFound, setServiceNotFound] = useState(false)
+    const [showDropdown, setShowDropdown] = useState(false)
 
     const bookService = () => {
-      navigation.navigate(isLoggedIn ? "BookService" : "Login", isLoggedIn && {
+      navigation.navigate(authState === "loggedIn" ? "BookService" : "Login", authState === "loggedIn" && {
         service : service,
         userInformation : user
      })
@@ -79,6 +84,11 @@ const ViewService = ({route, navigation}) => {
           setLoading(true)
             try {
                 const result = await http.get(`getServiceInfo/${serviceId}`)
+                if(result.data.status === "Not found")
+                {
+                  setServiceNotFound(true)
+                  return
+                }
                 setService(result.data.service)
                 setRatings(result.data.ratings)
             } catch (error) {
@@ -93,32 +103,33 @@ const ViewService = ({route, navigation}) => {
 
     useEffect(()=>{
         navigation.setOptions({
-            headerRight : () =>(
-                <View style={{columnGap : 20}} className="w-full justify-end flex flex-row items-center">
-                <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.4)"}} onPress={()=>console.log("Hello")} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
-                    <FontAwesome name="heart-o" color="white" size={20} />
-                </TouchableOpacity>
-                <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} onPress={()=>console.log("Hello")} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
-                    <Entypo name="forward" color="white" size={20} />
-                </TouchableOpacity>
-                <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} onPress={()=>console.log("Hello")} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
-                    <FontAwesome name="ellipsis-v" color="white" size={23} />
-                </TouchableOpacity>
-              </View>
-              ),
               header : () => (
                 <View className="flex py-4">
-                <View style={{columnGap : 20}} className="w-full justify-end flex flex-row items-center">
+                <View style={{columnGap : 20}} className="w-full justify-end flex flex-row items-center relative">
+                
+                {/* Dropdown */}
+                {
+                  showDropdown &&
+                  <View className="absolute bg-white right-9 top-8 rounded-md">
+                  <TouchableOpacity onPress={()=>navigation.navigate("ReportService", {service})} className="px-2 py-1">
+                    <Text>Report</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity className="px-2 py-1">
+                    <Text>Do not show</Text>
+                  </TouchableOpacity>
+                  </View> 
+                }
+
                 <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.4)"}}  className="w-[30] h-[30] flex flex-row absolute left-3 justify-center items-center rounded-full" onPress={()=>navigation.goBack()}>
                 <FontAwesome name="angle-left" className="absolute bottom-[1] right-[11]" color="white" size={30} />
                 </TouchableOpacity>
-                <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.4)"}} onPress={()=>console.log("Hello")} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
-                    <FontAwesome name="heart-o" color="white" size={20} />
+                <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} onPress={()=>console.log("Hello")} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
+                    <FontAwesome name="heart-o" color="white" size={18} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>share("https://docs.expo.dev/versions/latest/sdk/sharing/")} style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
                     <Entypo name="forward" color="white" size={20} />
                 </TouchableOpacity>
-                <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} onPress={()=>console.log("Hello")} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
+                <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} onPress={()=>setShowDropdown(!showDropdown)} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
                     <FontAwesome name="ellipsis-v" color="white" size={23} />
                 </TouchableOpacity>
               </View>
@@ -126,8 +137,7 @@ const ViewService = ({route, navigation}) => {
                 </View>
               )
         })
-    },[])
-
+    },[showDropdown])
 
   return (
     <>
@@ -150,15 +160,28 @@ const ViewService = ({route, navigation}) => {
        </View>
        </>
       :
+      serviceNotFound
+      ?
+      <View className="w-full h-screen flex-col bg-white justify-center items-center">
+        <Text className="text-2xl font-medium text-gray-600">Service not found</Text>
+        <Text className="text-sm  text-gray-500 px-2 text-center">This could be that the service is deactivated, disabled or the credentials had changed.</Text>
+      </View>
+      :
       <View className="w-full flex flex-col flex-1 pb-[50] relative">
       <View className="w-full aspect-square bg-gray-50 overflow-hidden relative">
-      <PagerView ref={pagerRef} onPageSelected={(e)=>setFeaturedImageIndexSelected(e.nativeEvent.position)} style={{flex : 1}} initialPage={0}>
+      {
+        service?.featuredImages.length === 0
+        ?
+        <Image  containerStyle={{width: "100%", height : "100%", objectFit : "cover", borderRadius : 10}} source={require('../../../Utilities/Images/emptyImage.jpg')} /> 
+        :
+        <>
+              <PagerView ref={pagerRef} onPageSelected={(e)=>setFeaturedImageIndexSelected(e.nativeEvent.position)} style={{flex : 1}} initialPage={0}>
         {
             service?.featuredImages?.map((image, index)=>{
                 return (
                 <View key={index} style={{zIndex : 20, position : 'absolute', width : "100%", height : "100%"}}>
                 <ImageBackground blurRadius={7} source={{ uri : image.src}} style={{justifyContent : 'center', alignItems : 'center', backgroundColor : "rgba(0, 0, 0, 0.1)"}} >
-                <Image source={{uri : image.src}} style={{width : "100%", height : "100%", objectFit : "contain"}} />
+                <Image source={{uri : image.src}} containerStyle={{width : "100%", height : "100%"}} style={{objectFit : 'contain'}} />
                 </ImageBackground>
                 </View>
                 )
@@ -167,6 +190,8 @@ const ViewService = ({route, navigation}) => {
         
       </PagerView>
       <Text style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} className="absolute px-2 py-1 rounded-lg text-white bottom-2 right-2">{featuredImageIndexSelected + 1}/{service?.featuredImages.length}</Text>
+        </>
+      }
       </View>
 
       <FlatList
@@ -204,8 +229,15 @@ const ViewService = ({route, navigation}) => {
 
       {/* Owner Contact */}
       <View style={{columnGap : 15}} className="w-full flex flex-row items-center px-2 py-3 mt-2 bg-gray-100 rounded-md">
-        <View>
-        <Image source={{uri : service?.serviceProfileImage}} style={{width : 90, height : 90, borderRadius : 100}} />
+        <View className="w-[90] h-[90]">
+        {
+          service?.serviceProfileImage !== null
+          ?
+          <Image  containerStyle={{width : 90, height : 90, borderRadius : 100}} source={{uri : service?.serviceProfileImage}} /> 
+          :
+          <Image  containerStyle={{width : 90, height : 90, borderRadius : 100}} source={require('../../../Utilities/Images/emptyImage.jpg')} /> 
+        }
+        {/* <Image source={{uri : service?.serviceProfileImage}} containerStyle={{width : 90, height : 90, borderRadius : 100}} /> */}
         </View>
         <View style={{rowGap : 10}} className="w-full flex flex-col ">
         <View style={{columnGap : 10}} className="flex flex-row items-center">
@@ -267,7 +299,7 @@ const ViewService = ({route, navigation}) => {
         <Text className="text-sm font-medium">Gallery</Text>
         <TouchableOpacity className="w-[50] flex flex-row justify-end" onPress={()=>{navigation.navigate('ViewAllGallery',{galleryImages : service.galleryImages})}}><FontAwesome className="" name="angle-right" color="gray" size={30} /></TouchableOpacity>
         </View>
-        <ServiceGallery gallery={service?.galleryImages} /> 
+        <ServiceGallery gallery={service?.galleryImages} navigation={navigation} galleryImages={service?.galleryImages} /> 
       </View>
 
       <View className="w-full h-[15] bg-gray-100">
@@ -326,13 +358,15 @@ const ViewService = ({route, navigation}) => {
 
       </View>
     }
-      
-      
+
     </ScrollView>
     
     {/* Chat and Book button */}
-    <View  className="w-full h-[50] flex flex-row items-center justify-evenly bg-white absolute bottom-0">
-      <TouchableOpacity onPress={()=>navigation.navigate("ConversationWindow", {
+    {
+      service?.owner._id !== userInformation?._id && service !== null
+      &&
+      <View  className="w-full h-[50] flex flex-row items-center justify-evenly bg-white absolute bottom-0">
+      <TouchableOpacity disabled={service === null || userInformation === null} onPress={()=>navigation.navigate(authState === "loggedIn" ? "ConversationWindow" : "Login", {
         serviceOwnerId : service.owner._id,
         conversationId : null,
         userInformation
@@ -342,10 +376,12 @@ const ViewService = ({route, navigation}) => {
         <Text className="text-white w-fit text-center">Chat</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={()=>{bookService()}} className="bg-themeOrange w-[60%] py-2 rounded-md">
+      <TouchableOpacity disabled={service === null || userInformation === null || service?.acceptBooking === false} onPress={()=>{bookService()}} className={` ${service?.acceptBooking === false ? "bg-orange-300" : "bg-themeOrange"} w-[60%] py-2 rounded-md`}>
         <Text className="text-white w-full text-center">Book Now</Text>
       </TouchableOpacity>
     </View>
+    }
+
     </>
   )
 }

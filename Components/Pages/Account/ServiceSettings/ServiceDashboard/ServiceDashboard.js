@@ -6,6 +6,8 @@ import { Icon } from 'react-native-elements'
 import { useState } from 'react'
 import MonthPickerCS from '../ServiceReviews/MonthPicker'
 import SalesAndBookingChart from './SalesAndBookingChart'
+import RecentBookings from './RecentBookings'
+import TopBookedServices from './TopBookedServices'
 
 const ServiceDashboard = ({navigation}) => {
     const months = ["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
@@ -33,7 +35,7 @@ const ServiceDashboard = ({navigation}) => {
   return (
     <ScrollView contentContainerStyle={{flexDirection : 'column', rowGap : 15}} className="flex-1 bg-white p-0">
         {/* Header */}
-        <View className="flex-row items-center justify-between p-2">
+        <View className="flex-row items-center justify-between p-2 mt-2">
             <MonthPickerCS showMonthPicker={showMonthPicker} setShowMonthPicker={setShowMonthPicker} dateSelected={dateSelected} setDateSelected={setDateSelected} />
             <Text className="font-medium text-lg">Dasboard</Text>
             <TouchableOpacity onPress={()=>setShowMonthPicker(true)} className="border-[1px] border-gray-300 w-[150] flex-row items-center justify-between rounded-md overflow-hidden bg-white">
@@ -43,6 +45,8 @@ const ServiceDashboard = ({navigation}) => {
         </View>
       <SummaryDetails service={service} dateSelected={dateSelected} />
       <SalesAndBookingChart service={service} dateSelected={dateSelected} />
+      <TopBookedServices service={service} dateSelected={dateSelected} />
+      <RecentBookings service={service} dateSelected={dateSelected} />
     </ScrollView>
   )
 }

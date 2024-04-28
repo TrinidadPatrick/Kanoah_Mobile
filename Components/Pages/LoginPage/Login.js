@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Image, BackHandler, Pressable, ImageBackground } from 'react-native'
+import { View, Text, TextInput, Image, BackHandler, Pressable, ImageBackground, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { registerIndieID, unregisterIndieDevice } from 'native-notify';
@@ -6,6 +6,7 @@ import {FontAwesome} from '@expo/vector-icons'
 import http from '../../../http';
 import useInfo from '../../CustomHooks/UserInfoProvider';
 import * as SecureStore from 'expo-secure-store';
+import { Icon } from 'react-native-elements';
 
 
 const Login = (props) => {
@@ -16,7 +17,12 @@ const Login = (props) => {
         password : "",
     })
     const [invalidLogin, setInvalidLogin] = useState(false)
+    const [accDisabled, setAccountDisabled] = useState({
+      isDisabled : false,
+      reasons : []
+    })
     const [isLoading, setIsLoading] = useState(false)
+    const [passwordVisible, setPasswordVisible] = useState(false)
 
 
   const signin = async () => {
@@ -30,6 +36,11 @@ const Login = (props) => {
             navigation.navigate('Home')
         }
     } catch (error) {
+      if(error.response.data.status === "Account Disabled")
+      {
+        setAccountDisabled({isDisabled : true, reasons : error.response.data.reasons})
+        return
+      }
         setInvalidLogin(true)
     } finally{
         setIsLoading(false)
@@ -45,7 +56,7 @@ const Login = (props) => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
   
     return () => backHandler.remove()
-    }, [navigation]);
+  }, [navigation]);
 
   return (
     <ImageBackground source={require('../../../Utilities/Images/login_bg9.png')}>
@@ -53,7 +64,7 @@ const Login = (props) => {
     <View className={`${invalidLogin ? "block" : "hidden"} w-[90%] bg-red-200 py-2 mt-3 rounded-sm`}>
       <Text className='text-center text-sm text-red-600'>Invalid username/email or password.</Text>
     </View>
-        <View style={{rowGap : 30}} className="w-[95%] flex items-center py-5">
+        <View style={{rowGap : 15}} className="w-[95%] flex items-center py-5">
         <Image  style={{width: 230, height: 90, objectFit : "contain"}} source={require('../../../Utilities/Images/DarkLogo.png')} />
 
         {/* Buttons */}
@@ -72,15 +83,37 @@ const Login = (props) => {
         </Pressable>
         </View>
 
+        {
+          accDisabled.isDisabled &&
+          <View className="bg-red-100 p-2">
+          <Text className="text-red-500 text-sm text-center">
+          This account has been disabled for 
+          {
+            accDisabled.reasons.map((reason, index) => " " + reason + `${index === accDisabled.reasons.length - 1 ? "" : ","}` )
+          }
+          </Text>
+          </View>
+        }
+
         {/* Text Input */}
-        <View style={{rowGap : 15}} className="w-full px-3 flex">
+        <View style={{rowGap : 15}} className={`w-full px-3 flex ${accDisabled.isDisabled ? "mt-0" : "mt-6"}`}>
             <View style={{borderBottomWidth : 1, columnGap : 5}} className="w-full flex flex-row items-center">
             <FontAwesome name='user-circle-o' size={20} color="gray"/>
             <TextInput value={userInfos.UsernameOrEmail} onChangeText={text => setUserInfo({...userInfos, UsernameOrEmail : text})} placeholder='Username/Email'  className="w-full text-base p-2" />
             </View>
             <View style={{borderBottomWidth : 1, columnGap : 5}} className="w-full flex flex-row items-center relative">
             <FontAwesome name='lock' size={20} color="gray"/>
-            <TextInput value={userInfos.password} onChangeText={text => setUserInfo({...userInfos, password : text})} secureTextEntry={true} placeholder='Password'  className=" w-full text-base p-2" />
+            <TextInput value={userInfos.password} onChangeText={text => setUserInfo({...userInfos, password : text})} secureTextEntry={!passwordVisible} placeholder='Password'  className=" w-full text-base p-2" />
+            {
+              passwordVisible ? 
+              <TouchableOpacity onPress={()=>setPasswordVisible(false)} className="absolute right-2">
+              <Icon type='material-community' name='eye-outline' color='gray' />
+              </TouchableOpacity>
+              :
+              <TouchableOpacity onPress={()=>setPasswordVisible(true)} className="absolute right-2">
+              <Icon type='material-community' name='eye-off-outline' color='gray' />
+              </TouchableOpacity>
+            }
             <Text onPress={()=>navigation.navigate('ForgotPassword')} className="text-xs text-blue-500  absolute -bottom-5 right-0">Forgot Password</Text>
             </View>
             
