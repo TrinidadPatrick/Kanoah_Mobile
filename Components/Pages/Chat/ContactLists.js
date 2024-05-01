@@ -160,10 +160,16 @@ const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
             </TouchableOpacity>}
         </View>
         {
-            authState === "loggedIn"
-            &&
-            <FlatList
-        data={contactList}
+        authState === "loggedIn"
+        &&
+        contactList?.length === 0
+        ?
+        <View className="flex-1 flex-col items-center justify-center">
+            <Text className="text-3xl font-medium text-gray-600">No chats</Text>
+        </View>
+        :
+        <FlatList
+        data={contactList?.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt))}
         contentContainerStyle={{gap : 10}}
         keyExtractor={(item) => item._id}
         renderItem={({item})=>{

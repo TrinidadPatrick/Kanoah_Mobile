@@ -7,6 +7,7 @@ import * as SecureStore from 'expo-secure-store'
 import {FontAwesome, Entypo} from 'react-native-vector-icons'
 import io from 'socket.io-client'
 import serviceStore from '../../../../../Stores/UserServiceStore'
+import axios from 'axios'
 
 const ServiceInProgressBookings = ({route, navigation}) => {
   const {service} = serviceStore()

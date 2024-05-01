@@ -89,6 +89,85 @@ const BookConfirmation = ({route, navigation}) => {
     }
 
     const submitBooking = async () => {
+
+        const htmlContent = `
+        <div class='w-full bg-[#f9f9f9] flex overflow-auto flex-col h-fit py-3 relative space-y-2 rounded-md '>
+        <h1 class='text-center font-semibold text-lg md:text-lg text-gray-800'>Booking Confirmation</h1>
+        <button class='absolute top-1'>
+            <ArrowBackIosOutlinedIcon class=' hover:text-gray-400' fontSize='small left-0' />
+        </button>
+
+        <div class='flex gap-3 w-full bg-white border shadow-sm p-2'>
+            <div class='w-[120px] min-w-[120px] flex items-center rounded-sm overflow-hidden aspect-video '>
+                <img src=${service.serviceProfileImage} alt="service image" />
+            </div>
+            <div class='w-full'>
+                <h1 class='font-medium text-sm md:text-base'>${service.basicInformation?.ServiceTitle}</h1>
+                <h2 class='font-normal text-xs md:text-sm'>Service: ${finalBookingInformation?.service?.selectedService}</h2>
+                <h2 class='font-normal text-xs md:text-sm'>Variant: ${finalBookingInformation?.service?.selectedVariant.type}</h2>
+                <h2 class='font-normal text-xs md:text-sm'>Service Option: ${finalBookingInformation?.schedule?.serviceOption}</h2>
+            </div>
+            <div class='relative justify-self-end w-fit font-semibold'>
+                ₱${finalBookingInformation?.service?.price}
+            </div>
+        </div>
+
+        <div class='w-full bg-white border rounded-sm shadow-sm'>
+            <h2 class='font-semibold'>Booking ID: <span class='font-normal underline text-blue-500'>${finalBookingInformation?.booking_id}</span></h2>
+        </div>
+
+
+        <div class='bg-white w-full rounded-sm shadow-sm'>
+           
+            <div class='flex h-fit items-stretch justify-between gap-2 flex-col md:flex-row-reverse'>
+
+            <ul class='w-full max-w-full text-ellipsis overflow-hidden'>
+                <h1 class='font-semibold text-xs'>Client Details</h1>
+                <li class='text-xs md:text-sm text-gray-700'>${finalBookingInformation?.contactAndAddress?.firstname + " " + finalBookingInformation?.contactAndAddress?.lastname}</li>
+                <li class='text-xs md:text-sm text-gray-700'>${finalBookingInformation?.contactAndAddress?.email}</li>
+                <li class='text-xs md:text-sm text-gray-700'>+63${finalBookingInformation?.contactAndAddress?.contact}</li>
+            </ul>
+
+            <ul class='w-full '>
+            <h1 class='font-semibold'>Schedule</h1>
+                <li class='text-xs md:text-sm text-gray-700'>${new Date(finalBookingInformation?.schedule?.bookingDate).toLocaleDateString('EN-US', {
+                    month : 'long',
+                    day : '2-digit',
+                    year : 'numeric'
+                })}</li >
+                <li class='text-xs md:text-sm text-gray-700'>${finalBookingInformation?.schedule?.timeSpan[0]} - ${finalBookingInformation?.schedule?.timeSpan[1]}</li >
+            </ul>
+            </div>
+
+            <div class='mt-2'>
+            <h2 class='font-semibold'>Address</h2>
+            <ul class='flex items-start '>
+                <li class='text-xs md:text-sm font-medium mx-0.5 text-gray-700'>${finalBookingInformation?.contactAndAddress?.Address.barangay.name}, 
+                ${finalBookingInformation?.contactAndAddress?.Address.municipality.name}, ${finalBookingInformation?.contactAndAddress?.Address.province.name}, ${finalBookingInformation?.contactAndAddress?.Address.region.name}</li>
+            </ul>
+            <span class='text-xs md:text-sm text-gray-700'>${finalBookingInformation?.contactAndAddress?.Address.street}</span>
+            </div>
+        </div>
+        <div class='p-3 bg-white w-full border rounded-sm shadow-sm'>
+        <ul class='grid grid-cols-2 gap-0 gap-x-5'>
+                <div class={'font-medium text-xs md:text-sm text-gray-600 '}>Total Service Amount:</div>
+                <div class={'font-normal pl-2 text-xs md:text-sm text-gray-600 '}>₱${finalBookingInformation?.service?.price}</div>
+                <div class={'font-medium text-xs md:text-sm text-gray-600 '}>Service Fee:</div>
+                <div class={'font-normal pl-2 text-xs md:text-sm text-gray-600 '}>₱${finalBookingInformation?.service_fee}</div>
+                <div class={'font-medium text-xs md:text-sm text-gray-600 '}>Booking Fee:</div>
+                <div class={'font-normal pl-2 text-xs md:text-sm text-gray-600 '}>₱${finalBookingInformation?.booking_fee}</div>
+                <div class={'font-medium text-xs md:text-sm text-gray-600 '}>Total amount to pay:</div>
+                <div class={'font-normal pl-2 text-xs md:text-sm text-red-500 border-t-1 border-gray-700 '}>₱${finalBookingInformation?.net_Amount}</div>
+        </ul>
+        </div>
+    </div>
+        `
+        try {
+            const result = await http.post('sendBookingReceipt', {email : userInformation.email, html : htmlContent})
+        } catch (error) {
+            console.log(Error)
+        }
+
         const receiver = service.owner._id
         if(finalBookingInformation !== null)
         {   

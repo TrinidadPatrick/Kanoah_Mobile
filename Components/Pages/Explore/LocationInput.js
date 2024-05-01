@@ -23,81 +23,98 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
     const [errorMsg, setErrorMsg] = useState(null);
     const [visible, setVisible] = useState(false);
     const [locationSearchValue, setLocationSearchValue] = useState('')
-    const [userLocStatus, setUSerLocStatus] = useState({})
-
-    // Location.getProviderStatusAsync() just gets the status of gps is on
-    // Location.enableNetworkProviderAsync() popup to turn on location
-    //  Location.getCurrentPositionAsync({}); gets the current position of the user
 
 
     const turnOnLocation = async (providerStatus) => {
-      // Meaning gps or lcoation is disabled
-      if(!providerStatus.locationServicesEnabled)
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if(status === 'granted')
       {
-        try {
-          await Location.enableNetworkProviderAsync()
+        if(!providerStatus.locationServicesEnabled)
+        {
+          try {
+            await Location.enableNetworkProviderAsync()
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation({
+              longitude: location.coords.longitude,
+              latitude: location.coords.latitude,
+            });
+                    
+            const newFilter = {
+                            ...selectedFilterState,
+                            coordinates: {
+                              latitude: location.coords.latitude,
+                              longitude: location.coords.longitude,
+                            },
+                            radius: 3,
+            };
+                          
+            storeFilter(newFilter);
+            const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`)
+                    
+            filterServices(newFilter);
+            setAddress(response.data.plus_code.compound_code);
+            setSelectedAddress(response.data.plus_code.compound_code);
+          } catch (error) {
+            // Meaning the user rejected the popup
+            const newFilter = {
+            ...selectedFilterState,
+            coordinates: {
+              latitude: 0,
+              longitude: 0,
+              },
+              radius: 3,
+            };
+            storeFilter(newFilter);
+            filterServices(newFilter);
+            setAddress("Select Address");
+            setSelectedAddress("Not Selected");
+          }
+          }
+          // Meaning the gps is already on
+          else
+        {
+
           let location = await Location.getCurrentPositionAsync({});
-          setLocation({
-            longitude: location.coords.longitude,
-            latitude: location.coords.latitude,
-          });
-                  
+            setLocation({
+              longitude: location.coords.longitude,
+              latitude: location.coords.latitude,
+            });
+                    
+            const newFilter = {
+                            ...selectedFilterState,
+                            coordinates: {
+                              latitude: location.coords.latitude,
+                              longitude: location.coords.longitude,
+                            },
+                            radius: 3,
+            };
+                          
+            storeFilter(newFilter);
+            const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`)
+                    
+            filterServices(newFilter);
+            setAddress(response.data.plus_code.compound_code);
+            setSelectedAddress(response.data.plus_code.compound_code);
+          }
+        } 
+        else {
+          // Permission denied or not granted, handle accordingly
           const newFilter = {
-                          ...selectedFilterState,
-                          coordinates: {
-                            latitude: location.coords.latitude,
-                            longitude: location.coords.longitude,
-                          },
-                          radius: 3,
-          };
-                        
-          storeFilter(newFilter);
-          const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`)
-                  
-          filterServices(newFilter);
-          setAddress(response.data.plus_code.compound_code);
-          setSelectedAddress(response.data.plus_code.compound_code);
-        } catch (error) {
-          // Meaning the user rejected the popup
-          const newFilter = {
-          ...selectedFilterState,
-          coordinates: {
-            latitude: 0,
-            longitude: 0,
-            },
-            radius: 3,
-          };
-          storeFilter(newFilter);
-          filterServices(newFilter);
-          setAddress("Select Address");
-          setSelectedAddress("Not Selected");
-        }
+            ...selectedFilterState,
+            coordinates: {
+              latitude: 0,
+              longitude: 0,
+              },
+              radius: 3,
+            };
+            storeFilter(newFilter);
+            filterServices(newFilter);
+            setAddress("Select Address");
+            setSelectedAddress("Not Selected");
       }
-      // Meaning the gps is already on
-      else
-      {
-        let location = await Location.getCurrentPositionAsync({});
-          setLocation({
-            longitude: location.coords.longitude,
-            latitude: location.coords.latitude,
-          });
-                  
-          const newFilter = {
-                          ...selectedFilterState,
-                          coordinates: {
-                            latitude: location.coords.latitude,
-                            longitude: location.coords.longitude,
-                          },
-                          radius: 3,
-          };
-                        
-          storeFilter(newFilter);
-          const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`)
-                  
-          filterServices(newFilter);
-          setAddress(response.data.plus_code.compound_code);
-          setSelectedAddress(response.data.plus_code.compound_code);
-      }
+      
+      
+      
     }
 
     const checkGpsStatus = async () => {
@@ -109,7 +126,7 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
       }
     };
 
-       useFocusEffect(
+    useFocusEffect(
       useCallback(() => {
         checkGpsStatus();
       }, [])
@@ -163,7 +180,6 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
     
     const confirmLocation = async (radius) => {
       const newFilter = {...selectedFilterState, coordinates : location, radius : radius}
-      
       storeFilter(newFilter)
       try {
         const result = await http.get(`Mobile_GetServicesByFilter?category=${newFilter.category.category_id}&subCategory=${newFilter.subCategory.subCategory_id}&ratings=${newFilter.ratings}&search=${newFilter.searchValue}&latitude=${newFilter.coordinates.latitude}&longitude=${newFilter.coordinates.longitude}&radius=${radius}`)

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback, FlatList, Share, Linking, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback, FlatList, Share, Linking, ToastAndroid } from 'react-native'
 import React from 'react'
 import { Image } from 'react-native-elements';
 import { StatusBar as MainStatusbar } from 'expo-status-bar';
@@ -12,6 +12,7 @@ import useInfo from '../../CustomHooks/UserInfoProvider'
 import ServiceDescription from './ServiceDescription'
 import ServiceReviews from './ServiceReviews';
 import ServiceOffers from './ServiceOffers';
+import * as SecureStore from 'expo-secure-store'
 import ServiceSchedule from './ServiceSchedule';
 import ServiceGallery from './ServiceGallery';
 import useBookingStore from '../BookService/BookServiceStore'
@@ -114,7 +115,7 @@ const ViewService = ({route, navigation}) => {
                   <TouchableOpacity onPress={()=>navigation.navigate("ReportService", {service})} className="px-2 py-1">
                     <Text>Report</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity className="px-2 py-1">
+                  <TouchableOpacity onPress={()=>addToDNS()} className="px-2 py-1">
                     <Text>Do not show</Text>
                   </TouchableOpacity>
                   </View> 
@@ -123,11 +124,8 @@ const ViewService = ({route, navigation}) => {
                 <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.4)"}}  className="w-[30] h-[30] flex flex-row absolute left-3 justify-center items-center rounded-full" onPress={()=>navigation.goBack()}>
                 <FontAwesome name="angle-left" className="absolute bottom-[1] right-[11]" color="white" size={30} />
                 </TouchableOpacity>
-                <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} onPress={()=>console.log("Hello")} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
+                <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} onPress={()=>addToFavorites()} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
                     <FontAwesome name="heart-o" color="white" size={18} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>share("https://docs.expo.dev/versions/latest/sdk/sharing/")} style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
-                    <Entypo name="forward" color="white" size={20} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{backgroundColor : "rgba(0, 0, 0, 0.6)"}} onPress={()=>setShowDropdown(!showDropdown)} className="w-[30] h-[30] flex flex-row justify-center items-center rounded-full">
                     <FontAwesome name="ellipsis-v" color="white" size={23} />
@@ -138,6 +136,55 @@ const ViewService = ({route, navigation}) => {
               )
         })
     },[showDropdown])
+
+    const addToFavorites = async () => {
+      ToastAndroid.showWithGravity(
+        'Added to favorites',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+
+      const data = {
+        serviceId,
+        createdAt : new Date()
+      }
+  
+      try {
+        const accessToken = await SecureStore.getItemAsync("accessToken")
+        const result = await http.post('Mobile_addFavorites', data, {
+            headers : {'Authorization' : `Bearer ${accessToken}`}
+        })
+      } catch (error) {
+        console.log(error)
+      } 
+      
+    }
+
+    const addToDNS = async () => {
+      setShowDropdown(false)
+      ToastAndroid.showWithGravity(
+        'Added to blocklist',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+
+      const data = {
+        serviceId,
+        createdAt : new Date()
+      }
+  
+      try {
+        const accessToken = await SecureStore.getItemAsync("accessToken")
+        const result = await http.post('Mobile_addToDoNotShow', data, {
+            headers : {'Authorization' : `Bearer ${accessToken}`}
+        })
+      } catch (error) {
+        console.log(error.response)
+      } 
+      
+    }
+
+    
 
   return (
     <>
@@ -366,7 +413,7 @@ const ViewService = ({route, navigation}) => {
       service?.owner._id !== userInformation?._id && service !== null
       &&
       <View  className="w-full h-[50] flex flex-row items-center justify-evenly bg-white absolute bottom-0">
-      <TouchableOpacity disabled={service === null || userInformation === null} onPress={()=>navigation.navigate(authState === "loggedIn" ? "ConversationWindow" : "Login", {
+      <TouchableOpacity disabled={service === null || userInformation === null && authState === "LoggedIn"} onPress={()=>navigation.navigate(authState === "loggedIn" ? "ConversationWindow" : "Login", {
         serviceOwnerId : service.owner._id,
         conversationId : null,
         userInformation
@@ -376,7 +423,7 @@ const ViewService = ({route, navigation}) => {
         <Text className="text-white w-fit text-center">Chat</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity disabled={service === null || userInformation === null || service?.acceptBooking === false} onPress={()=>{bookService()}} className={` ${service?.acceptBooking === false ? "bg-orange-300" : "bg-themeOrange"} w-[60%] py-2 rounded-md`}>
+      <TouchableOpacity disabled={service === null || service?.acceptBooking === false} onPress={()=>{bookService()}} className={` ${service?.acceptBooking === false ? "bg-orange-300" : "bg-themeOrange"} w-[60%] py-2 rounded-md`}>
         <Text className="text-white w-full text-center">Book Now</Text>
       </TouchableOpacity>
     </View>

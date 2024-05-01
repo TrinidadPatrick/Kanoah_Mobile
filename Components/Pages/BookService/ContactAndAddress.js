@@ -118,7 +118,7 @@ const ContactAndAddress = ({service, userInformation, bookingInformation, storeB
         <TouchableOpacity onPress={()=>setStep(2)} className="w-fit px-5 h-full flex flex-row items-center rounded-sm bg-gray-200">
             <Text className="text-gray-600">Back</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>{submit()}}  className="flex-1 rounded-sm flex flex-row justify-center items-center bg-themeOrange h-full">
+        <TouchableOpacity disabled={userDetails.Address === null} onPress={()=>{submit()}}  className={`flex-1 ${userDetails.Address === null ? "bg-orange-300" : "bg-themeOrange"} rounded-sm flex flex-row justify-center items-center  h-full`}>
             <Text  className="text-white">Next</Text>
         </TouchableOpacity>
         </View>

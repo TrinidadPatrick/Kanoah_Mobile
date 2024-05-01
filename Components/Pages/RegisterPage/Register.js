@@ -14,18 +14,29 @@ const Register = (props) => {
     const [validInput, setValidInput] = useState({username : true, password : true})
     const [usernameTaken, setUsernameTaken] = useState(false)
 
+
     const next = async () => {
         const {username, password} = userInfos
-        setUsernameTaken(false)
+
+        const uppercaseRegex = /[A-Z]/;
+        const lowercaseRegex = /[a-z]/;
+        const numberRegex = /[0-9]/;
+        const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
+
+        const hasUppercase = uppercaseRegex.test(password);
+        const hasLowercase = lowercaseRegex.test(password);
+        const hasNumber = numberRegex.test(password);
+        const hasSpecialChar = specialCharRegex.test(password);
+
         if(username.length < 5){
         setValidInput((prevData) => ({...prevData, username : false}))
         }if (username.length > 5){
             setValidInput((prevData) => ({...prevData, username : true}))
-        }if(password.length < 8){
+        }if(password.length < 8 || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecialChar){
             setValidInput((prevData) => ({...prevData, password : false}))
-        }if(password.length >= 8){
+        }if(password.length >= 8 && hasUppercase && hasLowercase && hasNumber && hasSpecialChar){
             setValidInput((prevData) => ({...prevData, password : true}))
-        }if(username.length >= 5 && password.length >= 8)
+        }if(username.length >= 5 && password.length >= 8 && hasUppercase && hasLowercase && hasNumber && hasSpecialChar)
         {
             try {
                 const result = await http.post("verifyUsername", {username : userInfos.username})
@@ -81,10 +92,12 @@ const Register = (props) => {
             <Text className={`text-red-500 ${!usernameTaken ? "hidden" : ""} -bottom-4 text-xs absolute`}>Username already taken</Text>
             </View>
             
-            <View style={{borderBottomWidth : 1, columnGap : 5}} className={`w-full flex ${!validInput.password || usernameTaken ? "border-red-500" : ""} relative flex-row items-center`}>
+            <View className="flex-col">
+            <View style={{borderBottomWidth : 1, columnGap : 5}} className={` ${!validInput.password || usernameTaken ? "border-red-500" : ""} relative flex-row items-center`}>
             <FontAwesome name='lock' size={20} color="gray"/>
             <TextInput value={userInfos.password} onChangeText={(text)=>{setUserInfo({...userInfos, password : text})}} secureTextEntry={true} placeholder='Create password'  className=" w-full text-base p-2" />
-            <Text className={`text-red-500 ${validInput.password ? "hidden" : ""} -bottom-4 text-xs absolute`}>Password must contain atleast 8 characters</Text>
+            </View>
+            <Text className={`text-red-500 ${validInput.password ? "hidden" : ""}  text-xs`}>Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character</Text>
             </View>
             
         </View>

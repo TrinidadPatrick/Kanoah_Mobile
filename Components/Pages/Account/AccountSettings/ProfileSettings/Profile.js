@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator } from 'react-native'
 import { LogBox } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native'
 import { Overlay } from 'react-native-elements';
@@ -6,7 +6,6 @@ import http from '../../../../../http'
 import * as SecureStore from 'expo-secure-store';
 import * as FileSystem from 'expo-file-system';
 import React, { useEffect, useState } from 'react'
-import { Image } from 'react-native';
 import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
@@ -19,6 +18,7 @@ const Profile = ({navigation}) => {
     const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
     const [visible, setVisible] = useState(false);
+    const [uploading, setUploading] = useState(false)
 
     LogBox.ignoreLogs([
         'Non-serializable values were found in the navigation state',
@@ -119,12 +119,13 @@ const Profile = ({navigation}) => {
         const newProfile = {...profile, profileImage : `https://ui-avatars.com/api/?name=${profile.firstname}+${profile.lastname}&background=0D8ABC&color=fff`}
         setProfile(newProfile)
         try {
-            const result = await http.patch('Mobile_updateProfile', profile, {
+            const result = await http.patch('Mobile_updateProfile', newProfile, {
                 headers: {
                   Authorization: `Bearer ${accessToken}`,
                   'Content-Type': 'application/json',
                 },
               })
+             setVisible(false)
         } catch (error) {
             console.log(error)
         }
@@ -138,7 +139,7 @@ const Profile = ({navigation}) => {
             "upload_preset": "KanoahProfileUpload",
           }
 
-
+          setUploading(true)
           axios.post(apiUrl, data, {
             headers: {
               'Content-Type': 'application/json',
@@ -161,8 +162,29 @@ const Profile = ({navigation}) => {
             })
             .catch((error) => {
               console.log(error);
-            });
+            }).finally(()=>{
+              setUploading(false)
+              setVisible(false)
+            })
     }   
+
+    const RenderImage = ({url, firstname, lastname}) => {
+      const baseUrl = url?.split(".")[0]
+
+      if(baseUrl === "https://ui-avatars")
+      {
+          return (
+              <View className="w-[120] h-[120] flex-row justify-center items-center rounded-full bg-blue-400 ">
+                  <Text style={{fontSize : 50}} className=" text-white">{firstname.charAt(0)}</Text>
+                  <Text style={{fontSize : 50}} className=" text-white">{lastname.charAt(0)}</Text>
+              </View>
+          )
+      }
+
+      return (
+          <Image source={{ uri : url}} style={{width : 120, height : 120}} className="rounded-full" />
+      )
+  }
 
 
 
@@ -172,7 +194,8 @@ const Profile = ({navigation}) => {
         <View className=" flex flex-row justify-center py-3">
             <TouchableOpacity onPress={()=>setVisible(true)} className="relative  rounded-full">
             <FontAwesome className={` absolute bottom-1 p-2 bg-gray-300 rounded-full right-0 z-20`} name="camera" size={20} color="gray" />
-            <Image style={{width: 120, height: 120, objectFit : "contain", borderRadius : 100, borderWidth : 2, borderColor : "gray"}} source={{uri : profile?.profileImage}} />
+            <RenderImage url={profile?.profileImage} firstname={profile?.firstname} lastname={profile?.lastname} />
+            {uploading &&  <ActivityIndicator color='white' className="absolute top-12 left-12" />}
             </TouchableOpacity>
         </View>
 

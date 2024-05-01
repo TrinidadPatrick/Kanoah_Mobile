@@ -18,6 +18,7 @@ const Notifications = ({navigation}) => {
     const [page, setPage] = useState(1);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [noNotifs, setNoNotifs] = useState(false)
 
     useFocusEffect(
       useCallback(()=>{
@@ -43,18 +44,34 @@ const Notifications = ({navigation}) => {
           if(result.data.length !== 0)
           {
             setNotifications(result.data)
+            return
           }
+          setNoNotifs(true)
         } catch (error) {
           console.error(error)
         }
     }
-    
-    useEffect(()=>{
-      if(authState === "loggedIn")
+
+    useFocusEffect(
+      useCallback(()=>{
+        if(authState === "loggedIn")
       {
         getNotifications()
       }
-    },[authState])
+
+        return () => {
+        
+        }
+      },[authState])
+      
+    )
+    
+    // useEffect(()=>{
+    //   if(authState === "loggedIn")
+    //   {
+    //     getNotifications()
+    //   }
+    // },[authState])
 
     const loadMoreData = async () => {
         const nextPage = page + 1
@@ -172,6 +189,16 @@ const Notifications = ({navigation}) => {
       {
         authState === "loggedIn"
         &&
+        noNotifs
+        ?
+        <View className="flex-1 flex-col items-center justify-center">
+            <Text className="text-3xl font-medium text-gray-600">No notifications</Text>
+        </View>
+        :
+        authState === "loggedIn"
+        &&
+        !noNotifs
+        ?
         <FlatList
         data={notifications?.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt))}
         // onRefresh={()=>}
@@ -282,6 +309,8 @@ const Notifications = ({navigation}) => {
           )
         }}
         />
+        :
+        ""
       }
 
     <BottomSheet containerStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} backdropTransitionOutTiming={0} onBackdropPress={()=>setOpenMoreOption(false)} modalProps={{}} isVisible={openMoreOption}>

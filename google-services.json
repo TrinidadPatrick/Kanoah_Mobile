@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "853418783942",
-    "project_id": "kanoahmobile",
-    "storage_bucket": "kanoahmobile.appspot.com"
+    "project_number": "609429720666",
+    "project_id": "kanoahmobile-5087c",
+    "storage_bucket": "kanoahmobile-5087c.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:853418783942:android:bda773f16df619aa4113c7",
+        "mobilesdk_app_id": "1:609429720666:android:1f4ee158d66f1db2141263",
         "android_client_info": {
           "package_name": "com.example.mynewapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAqZ3BmPPLxQ3jUDVe9-_nqESdnM_2rqz4"
+          "current_key": "AIzaSyBu168vWHHtKNuHskz8bPsywYBnNHoATH0"
         }
       ],
       "services": {

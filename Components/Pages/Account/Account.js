@@ -29,7 +29,6 @@ const Account = ({navigation}) => {
   }
 
 
-
   return (
     <View className="bg-white h-full flex flex-col px-5 py-5 relative">
       <Text className="text-4xl font-medium">Settings</Text>
@@ -92,7 +91,14 @@ const Account = ({navigation}) => {
               <Text>Add service</Text>
             </TouchableOpacity>
           </View>
-
+          :
+          service?.status.status === "Disabled"
+          ?
+          <View className="w-full flex-col p-2 bg-red-100 mt-5">
+            <Text className="text-red-500 font-medium text-center">Service is currently disabled due to {
+            service?.status.reasons.map((reason, index)=> reason + `${service?.status.reasons.length - 1 === index ? "" : ", "}`)  
+            }</Text>
+          </View>
           :
           <View style={{rowGap : 20}} className="mt-5 flex flex-col">
           {/* Edit Profile */}

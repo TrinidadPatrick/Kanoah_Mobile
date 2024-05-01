@@ -159,7 +159,7 @@ const Explore = ({navigation}) => {
 
         {/* Service Lists */}
         <View style={{paddingBottom : Number(tabBarHeight.toFixed(0))}} className={` h-[100%] px-3 `} >
-          <ExploreServiceList navigation={navigation} setServiceList={setServiceList} loading={loading} serviceList={serviceList} categories={categories} subCategories={subCategories} />
+          <ExploreServiceList selectedSortingOption={selectedSortingOption} handleSort={handleSort} navigation={navigation} setServiceList={setServiceList} loading={loading} serviceList={serviceList} categories={categories} subCategories={subCategories} />
         </View>
 
         </Drawer>

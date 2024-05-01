@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid, ActivityIndicator } from 'react-native'
 import {FontAwesome, Entypo} from 'react-native-vector-icons'
 import { Button } from '@rneui/themed'
 import { useState } from 'react'
@@ -18,6 +18,7 @@ const ChangePasswordProfile = ({route, navigation}) => {
         confirmPassword : ''
     })
     const [errorMsg, setErrorMsg] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const verifyInput = async () => {
         // Check if the password matches
@@ -26,21 +27,29 @@ const ChangePasswordProfile = ({route, navigation}) => {
             setErrorMsg("Password do not match")
             return
         }
-        console.log("Hello")
         try {
+            setLoading(true)
             const data = {
                 _id : _id,
                 password : input.oldPassword,
                 newPassword : input.newPassword
             }
             const result = await http.patch('updatePassword', data)
-            console.log(result.data)
             if(result.data.status === "invalid")
             {
                 setErrorMsg("Password is incorrect")
+                return
             }
+            ToastAndroid.showWithGravity(
+                'Password updated',
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
+              );
+            navigation.goBack()
         } catch (error) {
             console.log(error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -112,14 +121,14 @@ const ChangePasswordProfile = ({route, navigation}) => {
         <Button
         onPress={()=>verifyInput()}
             disabled={input.oldPassword.length === 0 || input.newPassword.length < 9 || input.confirmPassword.length < 9}
-            title={'Reset Password'}
+            title={loading ? <ActivityIndicator /> : "Submit"}
             containerStyle={{
             width: "100%",
             marginTop : 10,
             }}
             buttonStyle={{
             backgroundColor : "#EB6B23"
-            }}
+        }}
         />
       
     </View>

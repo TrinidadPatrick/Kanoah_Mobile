@@ -104,6 +104,7 @@ export default function App() {
          const notifCount = await http.get('Mobile_countUnreadNotifs', {
           headers : {'Authorization' : `Bearer ${accessToken}`}
          })
+         console.log(notifCount.data)
          setUnreadNotifCounts(notifCount.data)
       } catch (error) {
         console.log(error)
@@ -130,6 +131,7 @@ export default function App() {
         {
         setSocket(io("https://kanoah.onrender.com"))
         countUnreadChats()
+        countUnreadNotifs()
         }
     },[authState])
 

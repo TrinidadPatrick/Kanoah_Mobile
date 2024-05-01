@@ -6,7 +6,7 @@ import { Skeleton } from '@rneui/themed';
 import useStore from '../../../store'
 import http from '../../../http';
 
-const ExploreServiceList = ({serviceList, categories, subCategories, loading, setServiceList, navigation}) => {
+const ExploreServiceList = ({serviceList, categories, subCategories, loading, setServiceList,selectedSortingOption,handleSort, navigation}) => {
     const { selectedFilterState, storeFilter, decrement } = useStore();
     const [refreshing, setRefreshing] = useState(false);
 
@@ -15,8 +15,7 @@ const ExploreServiceList = ({serviceList, categories, subCategories, loading, se
         setRefreshing(true)
         try {
             const result = await http.get(`Mobile_GetServicesByFilter?category=${selectedFilterState.category.category_id}&subCategory=${selectedFilterState.subCategory.subCategory_id}&ratings=${selectedFilterState.ratings}&search=${selectedFilterState.searchValue}&latitude=${selectedFilterState?.coordinates.latitude}&longitude=${selectedFilterState?.coordinates.longitude}&radius=${selectedFilterState?.radius}`)
-            console.log(result.data.services)
-            setServiceList(result.data.services)
+            handleSort(selectedSortingOption, result.data.services)
         } catch (error) {
             console.log(error)
         } finally {

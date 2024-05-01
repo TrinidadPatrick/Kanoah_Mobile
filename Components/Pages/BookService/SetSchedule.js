@@ -11,7 +11,6 @@ const SetSchedule = ({service, userInformation, bookingInformation, storeBooking
         timeSelected : false,
         serviceOption : false,
       })
-    const [selectedDate, setSelectedDate] = useState(defaultDate);
     const [availableDays, setAvailableDays] = useState([])
     const [timeSelected, setTimeSelected] = useState('')
     const [timeSpan, setTimeSpan] = useState([])
@@ -21,16 +20,7 @@ const SetSchedule = ({service, userInformation, bookingInformation, storeBooking
     const [bookings, setBookings] = useState([])
     const [unavailableTimes, setUnavailableTimes] = useState([])
     const [bookingScheds, setBookingScheds] = useState([])
-
-    // Get the current date
-    const dateObj = new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-    }).replace(/\//g, '-');
-
-    const dateArray = dateObj.split("-");
-    const defaultDate = `${dateArray[2]}-${dateArray[0]}-${dateArray[1]}`;
+    const [selectedDate, setSelectedDate] = useState('');
 
     // Gets the day of the week today
     useEffect(() => {
@@ -66,20 +56,20 @@ const SetSchedule = ({service, userInformation, bookingInformation, storeBooking
     };
 
     // Set default selected date to correct format if not indicated
-    // useEffect(()=>{
-    //     if(selectedDate === '')
-    //     {
-    //         const dateObj = new Date().toLocaleDateString('EN-US', {
-    //             year: 'numeric',
-    //             month: '2-digit',
-    //             day: '2-digit',
-    //         }).replace(/\//g, '-')
+    useEffect(()=>{
+        if(selectedDate === '')
+        {
+            const dateObj = new Date().toLocaleDateString('EN-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            }).replace(/\//g, '-')
     
-    //         const dateArray = dateObj.split("-")
-    //         const defaultDate = dateArray[2] + "-" + dateArray[0] + "-" + dateArray[1]
-    //         setSelectedDate(defaultDate)
-    //     }
-    // },[])
+            const dateArray = dateObj.split("-")
+            const defaultDate = dateArray[2] + "-" + dateArray[0] + "-" + dateArray[1]
+            setSelectedDate(defaultDate)
+        }
+    },[])
 
     useEffect(()=>{
         const days = service.serviceHour.filter((sched)=> sched.isOpen).map((day, index) => day.day)

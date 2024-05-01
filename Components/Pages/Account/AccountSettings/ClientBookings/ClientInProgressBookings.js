@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, FlatList, Image, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, FlatList, Image, TouchableOpacity, Alert, ToastAndroid } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { BackHandler } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -6,6 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 import {FontAwesome, Entypo} from 'react-native-vector-icons'
 import io from 'socket.io-client'
 import http from '../../../../../http';
+import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
 const ClientInProgressBookings = ({navigation}) => {
@@ -76,27 +77,50 @@ const ClientInProgressBookings = ({navigation}) => {
     }
   }
 
-  const cancelBooking = async (bookingId, differenceInMinutes) => {
-    if(differenceInMinutes <= 5)
+  const cancelBooking = async (bookingObject) => {
+    const differenceInMilliseconds = Math.abs(new Date() - new Date(bookingObject.createdAt));
+      // Convert milliseconds to minutes
+      const differenceInMinutes = Math.floor(differenceInMilliseconds / (1000 * 60));
+    if(differenceInMinutes <= 50)
     {
-      const status = "CANCELLED"
-    const index = inProgressBookings.findIndex(booking => booking._id === bookingId)
+    const status = "CANCELLED"
+    const index = inProgressBookings.findIndex(booking => booking._id === bookingObject._id)
     if(index !== -1)
     {
-        const newBooking = [...inProgressBookings]
-        newBooking[index] = {...newBooking[index], ["status"] : status}
-        const filtered = newBooking.filter((booking) => booking.status === "INPROGRESS")
-        setInProgressBookings(filtered)
-        try {
-            const result = await http.patch(`respondBooking/${bookingId}`, {status})
-            notifyUser(inProgressBookings[index])
-        } catch (error) {
-            console.log(error)
-        }
+      Alert.alert('Cancel Booking', 'Do you want to cancel the booking?', [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: async () => {
+          const newBooking = [...inProgressBookings]
+          newBooking[index] = {...newBooking[index], ["status"] : status}
+          const filtered = newBooking.filter((booking) => booking.status === "INPROGRESS")
+          setInProgressBookings(filtered)
+          try {
+              const result = await http.patch(`respondBooking/${bookingObject._id}`, {status, updatedAt : new Date(), cancelledBy : {
+                role : "Client",
+                user : newBooking[index].client
+            }})
+              notifyUser(inProgressBookings[index])
+          } catch (error) {
+              console.log(error)
+          }
+        }},
+      ]);
+        
     }
     }
-
-    return ;
+    else
+    {
+      ToastAndroid.showWithGravityAndOffset(
+        'Cannot cancel booking',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+        25,
+        50,
+      );
+    }
   }
 
   // So when the back button is run, always back to the account page
@@ -179,9 +203,9 @@ const ClientInProgressBookings = ({navigation}) => {
             </View>
             {/* Cancell button */}
               {
-                differenceInMinutes <= 5 &&
+                differenceInMinutes <= 50 &&
                 <View className="w-full flex-row justify-end py-3 px-2">
-                <TouchableOpacity onPress={()=>cancelBooking(item._id, differenceInMinutes)} className="py-1 px-2 bg-gray-100 ">
+                <TouchableOpacity onPress={()=>cancelBooking(item)} className="py-1 px-2 bg-gray-100 ">
                 <Text className="text-gray-500">Cancel</Text>
                 </TouchableOpacity>
                 </View>

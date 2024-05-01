@@ -9,21 +9,43 @@ const NewPassword = ({ route, navigation }) => {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [invalidInput, setInvalidInput] = useState(false)
+    const [passDontMatch, setPasDontMatch] = useState(false)
 
     const submitPassword = async () => {
-        if(password !== confirmPassword )
+        const uppercaseRegex = /[A-Z]/;
+        const lowercaseRegex = /[a-z]/;
+        const numberRegex = /[0-9]/;
+        const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
+    
+        const hasUppercase = uppercaseRegex.test(password);
+        const hasLowercase = lowercaseRegex.test(password);
+        const hasNumber = numberRegex.test(password);
+        const hasSpecialChar = specialCharRegex.test(password);
+
+        if(password.length < 8 || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecialChar)
         {
+            setPasDontMatch(false)
             setInvalidInput(true)
             return
         }
-        try {
+        if(password != confirmPassword)
+        {
+          setPasDontMatch(false)
+          setPasDontMatch(true)
+        }
+        if(password == confirmPassword && password.length >= 8 && hasUppercase && hasLowercase && hasNumber && hasSpecialChar)
+        {
+          setPasDontMatch(false)
+          setInvalidInput(false)
+          try {
             const result = await http.post("forgotPassword/newPassword", {email, password})
-            console.log(result.data.status === "updated")
+            if(result.data.status === "updated")
             {
               navigation.navigate('Login')
             }
         } catch (error) {
             console.log(error)
+        }
         }
     }
   return (
@@ -32,8 +54,11 @@ const NewPassword = ({ route, navigation }) => {
         <Text className="text-xl font-medium">Set New Password</Text>
         <Text className="text-sm font-normal text-center">Please keep in mind to enter a strong and secured password</Text>
 
-        <View className={`px-3 ${invalidInput ? "flex" : "hidden"} bg-red-100 py-1.5 items-center justify-center mt-5`}>
+        <View className={`px-3 ${passDontMatch ? "flex" : "hidden"} bg-red-100 py-1.5 items-center justify-center mt-5`}>
             <Text className="text-red-500">Password do not match</Text>
+        </View>
+        <View className={`px-3 ${invalidInput ? "flex" : "hidden"} bg-red-100 py-1.5 items-center justify-center mt-5`}>
+            <Text className="text-red-500">Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character</Text>
         </View>
 
         <View style={{columnGap : 10}} className="w-full border-b-[1px] mt-5 flex flex-row items-center relative">
