@@ -185,7 +185,7 @@ const ContactLists = ({userInformation, isLoggedIn, setIsLoggedIn}) => {
                     userInformation
                 })}} className="w-full flex-row p-1 space-x-3   ">
                     {/* Image profile */}
-                    <View className="image-container w-12 rounded-full overflow-hidden aspect-square ">
+                    <View className="image-container flex-none w-12 rounded-full overflow-hidden aspect-square ">
                         {
                             isReceiverOwner ? <RenderImage url={sender.profileImage} firstname={sender.firstname} lastname={sender.lastname} /> 
                             :

@@ -11,7 +11,7 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { Image } from '@rneui/themed'
 
-const ConversationWindow = ({route}) => {
+const ConversationWindow = ({route, navigation}) => {
     const currentDate = new Date();
     const thisDate = new Date().toLocaleDateString('en-CA');
     let hours = currentDate.getHours();
