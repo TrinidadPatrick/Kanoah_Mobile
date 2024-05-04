@@ -1,8 +1,21 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, BackHandler } from 'react-native'
 import React from 'react'
+import { useEffect } from 'react'
 
 const ClientBookingDetails = ({route, navigation}) => {
     const bookingInformation = route.params.bookingDetails
+
+  // So when the back button is run, always back to the account page
+  useEffect(() => {
+    const backAction = () => {
+      navigation.goBack(); // Navigate to specific screen on back button press
+      return true; // Prevent default back button behavior
+    };
+  
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+  
+    return () => backHandler.remove()
+    }, [navigation]);
 
   return (
     <View className="flex-1  bg-white relative flex-col">
@@ -26,6 +39,15 @@ const ClientBookingDetails = ({route, navigation}) => {
         <View className="flex-row justify-between px-2 py-3 border-b-[1px] border-gray-100">
         <Text className="font-medium text-gray-600">Service Option</Text>
         <Text className="font-medium text-gray-900">{bookingInformation.schedule.serviceOption}</Text>
+        </View>
+        {/* Date booked */}
+        <View className="flex-row justify-between px-2 py-3 border-b-[1px] border-gray-100">
+        <Text className="font-medium text-gray-600">Date issued</Text>
+        <Text className="font-medium text-gray-900">{new Date(bookingInformation.createdAt).toLocaleDateString('EN-US', {
+            month : 'long',
+            day : '2-digit',
+            year : 'numeric'
+        })}</Text>
         </View>
         {/* Schedule */}
         <View className="flex-row justify-between items-center px-2 py-3 border-b-[1px] border-gray-100">

@@ -6,6 +6,7 @@ import http from '../../../../../http'
 import { Icon } from 'react-native-elements'
 import AddServiceOffer from './AddServiceOffer'
 import EditServiceOffer from './EditServiceOffer'
+import EditCancelationPolicy from './EditCancelationPolicy'
 
 const BookingSettings = ({serviceInfo}) => {
   const limits = Array.from({ length: 1000 }, (_, index) => index + 1);
@@ -13,6 +14,7 @@ const BookingSettings = ({serviceInfo}) => {
   const [fixedServiceOfferList, setFixedServiceOfferList] = useState([])
   const [showAddServiceModal, setShowAddServiceModal] = useState(false)
   const [showEditServiceModal, setShowEditServiceModal] = useState(false)
+  const [showEditCancelationPolicy, setShowEditCancelationPolicy] = useState(false)
   const [serviceOfferInfo, setServiceOfferInfo] = useState({
     uniqueId : '', 
     name : '',
@@ -97,6 +99,7 @@ const BookingSettings = ({serviceInfo}) => {
     <View className="flex-1 bg-white flex-col">
       <AddServiceOffer serviceOfferList={serviceOfferList} setServiceOfferList={setServiceOfferList} serviceOfferInfo={serviceOfferInfo} setServiceOfferInfo={setServiceOfferInfo} showAddServiceModal={showAddServiceModal} setShowAddServiceModal={setShowAddServiceModal}  />
       <EditServiceOffer serviceOfferList={serviceOfferList} setServiceOfferList={setServiceOfferList} serviceOfferInfo={serviceOfferInfo} setServiceOfferInfo={setServiceOfferInfo} showEditServiceModal={showEditServiceModal} setShowEditServiceModal={setShowEditServiceModal}  />
+      <EditCancelationPolicy serviceInfo={serviceInfo} showEditCancelationPolicy={showEditCancelationPolicy} setShowEditCancelationPolicy={setShowEditCancelationPolicy}  />
       {/* Top Navigation */}
       <View className="w-full px-2 flex-row items-center justify-between">
         {/* Accept booking */}
@@ -109,6 +112,12 @@ const BookingSettings = ({serviceInfo}) => {
         <Text className="text-gray-700 font-medium">Booking limit</Text>
           <TextInput inputMode='numeric' onSubmitEditing={()=>handleLimit()} onChangeText={(value)=>setBookingLimit(value)} value={String(bookingLimit)} className="px-2 py-0 border border-gray-200" />
         </View>
+      </View>
+      {/* Cancelation Policy */}
+      <View className="h-8 flex-row items-center mb-3 px-2">
+        <TouchableOpacity onPress={()=>{setShowEditCancelationPolicy(true)}} className='w-full h-full bg-gray-50 hover:bg-gray-100 flex-row items-center justify-center rounded-sm border border-gray-200 px-2'>
+          <Text className="text-gray-500 font-normal text-center">Edit cancelation policy</Text>
+        </TouchableOpacity>
       </View>
       {/* Navigation */}
       <View className="w-full flex-row px-2 pt-0 space-x-2">

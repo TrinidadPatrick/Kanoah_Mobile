@@ -186,7 +186,7 @@ const BookConfirmation = ({route, navigation}) => {
                     });
                 }
             } catch (error) {
-                alert(error)
+                console.log(error)
             }
            
 
@@ -290,6 +290,12 @@ const BookConfirmation = ({route, navigation}) => {
     </View>
     
     <ScrollView>
+        {/* Reminder */}
+        <View className=' w-full p-1 bg-white'>
+            <Text className='text-center text-sm'>Cancelation policy</Text>
+            <Text className='text-xs text-center text-gray-700'>{service?.cancelationPolicy?.cancelPolicy}</Text>
+            <Text className='text-xs text-center text-gray-700'>This policy is provided by the service provider.</Text>
+        </View>
         <Text className="font-semibold text-xl px-2 py-3 bg-gray-50 rounded-sm text-gray-600 text-center">{service.basicInformation.ServiceTitle}</Text>
       {/* Top Part, service information and booking */}
       <View className="flex-col">

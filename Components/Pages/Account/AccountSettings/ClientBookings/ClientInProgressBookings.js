@@ -78,10 +78,13 @@ const ClientInProgressBookings = ({navigation}) => {
   }
 
   const cancelBooking = async (bookingObject) => {
+    const cancelTimeLimit = bookingObject.shop.cancelationPolicy.cancelTimeLimit
+    const totalMinutesLimit = (cancelTimeLimit.day * 24 * 60) + (cancelTimeLimit.hour * 60) + cancelTimeLimit.minutes;
     const differenceInMilliseconds = Math.abs(new Date() - new Date(bookingObject.createdAt));
-      // Convert milliseconds to minutes
-      const differenceInMinutes = Math.floor(differenceInMilliseconds / (1000 * 60));
-    if(differenceInMinutes <= 50)
+    const differenceInMinutes = Math.floor(differenceInMilliseconds / (1000 * 60));
+
+
+    if(differenceInMinutes <= totalMinutesLimit)
     {
     const status = "CANCELLED"
     const index = inProgressBookings.findIndex(booking => booking._id === bookingObject._id)
@@ -134,8 +137,6 @@ const ClientInProgressBookings = ({navigation}) => {
 
   return () => backHandler.remove()
   }, [navigation]);
-
-
   
   return (
     <View className="flex-1 bg-[#f9f9f9]">
@@ -151,15 +152,15 @@ const ClientInProgressBookings = ({navigation}) => {
       data={inProgressBookings?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))}
       keyExtractor={(item) => item._id}
       renderItem={({ item }) => {
+      const cancelTimeLimit = item.shop.cancelationPolicy.cancelTimeLimit
+      const totalMinutesLimit = (cancelTimeLimit.day * 24 * 60) + (cancelTimeLimit.hour * 60) + cancelTimeLimit.minutes;
       const differenceInMilliseconds = Math.abs(new Date() - new Date(item.createdAt));
-      // Convert milliseconds to minutes
       const differenceInMinutes = Math.floor(differenceInMilliseconds / (1000 * 60));
-
-        const bookingDate = new Date(item.schedule.bookingDate).toLocaleDateString('EN-US', {
+      const bookingDate = new Date(item.schedule.bookingDate).toLocaleDateString('EN-US', {
           month : 'short', 
           day : '2-digit',
           year : 'numeric'
-        })
+      })
         
         return (
         <View 
@@ -203,7 +204,7 @@ const ClientInProgressBookings = ({navigation}) => {
             </View>
             {/* Cancell button */}
               {
-                differenceInMinutes <= 50 &&
+                differenceInMinutes < totalMinutesLimit &&
                 <View className="w-full flex-row justify-end py-3 px-2">
                 <TouchableOpacity onPress={()=>cancelBooking(item)} className="py-1 px-2 bg-gray-100 ">
                 <Text className="text-gray-500">Cancel</Text>

@@ -163,64 +163,30 @@ const SetSchedule = ({service, userInformation, bookingInformation, storeBooking
 
     // Sets the time available for the current day
     useEffect(()=>{
+        const date = new Date().getTime()
+        const yearToday = new Date().toISOString().split("T")[0]
+        const dateToday = new Date(date +  28800000)
         const schedule = service?.serviceHour.find((serviceHour) => serviceHour.day === currentDay)
-        const fromDate = new Date(`2000-01-01T${schedule?.fromTime}:00`);
-        const toDate = new Date(`2000-01-01T${schedule?.toTime}:00`);
-        // console.log(new Date(fromDate), toDate)
+        const fromDate = new Date(`${yearToday === selectedDate ? yearToday : selectedDate}T${schedule?.fromTime}:00`);
+        const toDate = new Date(`${selectedDate}T${schedule?.toTime}:00`);
         const timeArray = [];
-  
+
         let currentTime = fromDate;
         while (currentTime <= toDate) {
           const endTime = new Date(currentTime);
           endTime.setMinutes(endTime.getMinutes() + bookingInformation.service.duration);
           
           // Check if the end time is within the service hours
-          if (endTime <= toDate) {
-            
+          if (endTime <= toDate && new Date(currentTime.getTime() + 28800000) >= dateToday ) {
             const formattedTime = currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
             timeArray.push(formattedTime);
           }
           // Increment the current time by the interval in minutes
           currentTime.setMinutes(currentTime.getMinutes() + 30);
         }
-        
-        setBookingTimeSlot(timeArray);
-    },[currentDay, selectedDate])
-
-    // check and disables the time when necessary
-    useEffect(()=>{
-            if(bookingTimeSlot.length !== 0 && bookingScheds.length !== 0)
-            {
-              const unavailableTimes = []
-              const check = (time) => {
-                let count = 0;
-                
-              for (const timeSpan of bookingScheds) {
-                const startTime = new Date(`2000-01-01 ${timeSpan[0]}`);
-                const endTime = new Date(`2000-01-01 ${timeSpan[1]}`);
-                const targetTimeDate = new Date(`2000-01-01 ${time}`);
-        
-                if (targetTimeDate >= startTime && targetTimeDate <= endTime) {
-                  count++;
-                }
-              }
-            
-              return count
-              }
-        
-              bookingTimeSlot.map((slot) => {
-                const slotNumber = check(slot)
-                if(slotNumber == service.booking_limit)
-                {
-                  unavailableTimes.push(slot)
-                }
-              });
-      
-              setUnavailableTimes(unavailableTimes)
-            }
-           
-      
-    },[bookingTimeSlot, bookingScheds])
+              
+              setBookingTimeSlot(timeArray);
+          },[currentDay, selectedDate])
 
     // check and disables the time when necessary
     useEffect(()=>{
@@ -301,6 +267,7 @@ const SetSchedule = ({service, userInformation, bookingInformation, storeBooking
             setTimeSelected(bookingInformation.schedule.bookingTime)
         }
     },[])
+
 
     return (
     <View className="w-full flex-1 flex flex-col bg-[#eeeeee] ">
