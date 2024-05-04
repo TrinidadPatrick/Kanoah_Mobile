@@ -42,7 +42,7 @@ const ServiceFullAddress = ({address}) => {
   return (
     <>
     {
-        address !== undefined &&
+    address !== undefined &&
     <View className="flex-1 rounded-lg overflow-hidden relative">
     <View className="flex flex-col items-start mb-2">
         <Text numberOfLines={1}  className="text-sm text-gray-400  ">
