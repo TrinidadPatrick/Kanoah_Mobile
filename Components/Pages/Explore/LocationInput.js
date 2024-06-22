@@ -22,7 +22,8 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
     const [visible, setVisible] = useState(false);
-    const [locationSearchValue, setLocationSearchValue] = useState('')
+    const [placeInput, setPlaceInput] = useState('')
+    const [suggestedPlaces, setSuggestedPlaces] = useState([])
 
 
     const turnOnLocation = async (providerStatus) => {
@@ -34,6 +35,7 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
           try {
             await Location.enableNetworkProviderAsync()
             let location = await Location.getCurrentPositionAsync({});
+            console.log(location)
             setLocation({
               longitude: location.coords.longitude,
               latitude: location.coords.latitude,
@@ -49,11 +51,14 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
             };
                           
             storeFilter(newFilter);
-            const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`)
-                    
+            try {
+              const response = await axios.get(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${location.coords.longitude}&latitude=${location.coords.latitude}&access_token=pk.eyJ1IjoicGF0cmljazAyMSIsImEiOiJjbG8ybWJhb2MwMmR4MnFyeWRjMWtuZDVwIn0.mJug0iHxD8aq8ZdT29B-fg`)
+            setAddress(response.data.features[0].properties.full_address)
+            setSelectedAddress(response.data.features[0].properties.full_address)
+            } catch (error) {
+              console.log(error)
+            }                    
             filterServices(newFilter);
-            setAddress(response.data.plus_code.compound_code);
-            setSelectedAddress(response.data.plus_code.compound_code);
           } catch (error) {
             // Meaning the user rejected the popup
             const newFilter = {
@@ -73,7 +78,6 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
           // Meaning the gps is already on
           else
         {
-
           let location = await Location.getCurrentPositionAsync({});
             setLocation({
               longitude: location.coords.longitude,
@@ -90,11 +94,15 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
             };
                           
             storeFilter(newFilter);
-            const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`)
-                    
+            // const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`)
+            try {
+              const response = await axios.get(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${location.coords.longitude}&latitude=${location.coords.latitude}&access_token=pk.eyJ1IjoicGF0cmljazAyMSIsImEiOiJjbG8ybWJhb2MwMmR4MnFyeWRjMWtuZDVwIn0.mJug0iHxD8aq8ZdT29B-fg`)
+            setAddress(response.data.features[0].properties.full_address)
+            setSelectedAddress(response.data.features[0].properties.full_address)
+            } catch (error) {
+              console.log(error)
+            }
             filterServices(newFilter);
-            setAddress(response.data.plus_code.compound_code);
-            setSelectedAddress(response.data.plus_code.compound_code);
           }
         } 
         else {
@@ -141,13 +149,12 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
     }
 
 
-    const handleLocationSelect = async (coord) => {
-        setLocation({latitude : coord.lat, longitude : coord.lng})
-        setLocationSearchValue('')
-        const response = await axios.get(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coord.lat},${coord.lng}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`
-          );
-          setSelectedAddress(response.data.plus_code.compound_code)
+    const handleLocationSelect = async (place) => {
+        setLocation({latitude : place.center[1], longitude : place.center[0]})
+        setPlaceInput(place.place_name)
+        setSelectedAddress(place.place_name)
+        setAddress(place.place_name)
+        setSuggestedPlaces([])
           
     }
 
@@ -185,10 +192,31 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
         const result = await http.get(`Mobile_GetServicesByFilter?category=${newFilter.category.category_id}&subCategory=${newFilter.subCategory.subCategory_id}&ratings=${newFilter.ratings}&search=${newFilter.searchValue}&latitude=${newFilter.coordinates.latitude}&longitude=${newFilter.coordinates.longitude}&radius=${radius}`)
         
         const services = handleSort(selectedSortingOption, result.data.services)
+        setPlaceInput('')
       } catch (error) {
         console.log(error)
       }
     }
+
+    const handleAutoCompletePlace = async (value) => {
+      setPlaceInput(value)
+      if (value.length > 2) {
+        const response = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${value}.json`, {
+            params: {
+                access_token: 'pk.eyJ1IjoicGF0cmljazAyMSIsImEiOiJjbG8ybWJhb2MwMmR4MnFyeWRjMWtuZDVwIn0.mJug0iHxD8aq8ZdT29B-fg',
+                autocomplete: true,
+                limit: 5
+            }
+        });
+
+        setSuggestedPlaces(response.data.features)
+    }
+    else
+    {
+      setSuggestedPlaces([])
+    }
+  }
+
 
   return (
     <View className="px-3 py-3 ">
@@ -206,37 +234,24 @@ const LocationInput = ({filterServices, selectedSortingOption, setServiceList, n
             <View className="w-[100vw] h-full  flex flex-col justify-between p-2">
                 <View className=" flex flex-col">
                 <View className="h-[50px] bg-transparent overflow-visible p-1 z-30  relative">
-                <View className="h-[50px] bg-transparent absolute w-full   z-30">
+                <View className="h-[50px] bg-transparent border border-gray-200 rounded absolute flex items-center w-full   z-30">
                 <FontAwesome name="location-arrow" size={22} color="green" className="absolute z-10 top-3 left-3" />
                 {/* Search bar location */}
-                <GooglePlacesAutocomplete
-                isRowScrollable={true}
-                placeholder='Search'
-                fetchDetails={true}
-                onPress={(data, details = null) => {
-                  // 'details' is provided when fetchDetails = true
-                  handleLocationSelect(details.geometry.location);
-                }}
-                query={{
-                  key: 'AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA',
-                  language: 'en',
-                }}
-                styles={{
-                  textInputContainer : {
-                    paddingHorizontal : 25
-                  },
-                  listView : {
-                    backgroundColor : "red",
-                    padding : "20px",
-                  },
-                  container : {
-                    position : "absolute",
-                    width : "100%"
-                  }
-                }}
-              />
+                <TextInput value={placeInput} className=" w-full top-2 pl-10" placeholder="Input location" onChangeText={(value)=>handleAutoCompletePlace(value)} />
 
                 </View>
+                {
+                  suggestedPlaces?.length !== 0 &&
+                  <ScrollView className="w-full h-[300px] origin-top bg-white shadow p-3 absolute top-14">
+                 {
+                  suggestedPlaces.map((place, index)=>(
+                    <TouchableOpacity key={index} onPress={()=>handleLocationSelect(place)} className="p-2">
+                      <Text>{place.place_name}</Text>
+                    </TouchableOpacity>
+                  ))
+                 }
+                </ScrollView>
+                }
                 </View>
 
                 {/* Current Location */}

@@ -186,7 +186,7 @@ const SetSchedule = ({service, userInformation, bookingInformation, storeBooking
         }
               
               setBookingTimeSlot(timeArray);
-          },[currentDay, selectedDate])
+    },[currentDay, selectedDate])
 
     // check and disables the time when necessary
     useEffect(()=>{

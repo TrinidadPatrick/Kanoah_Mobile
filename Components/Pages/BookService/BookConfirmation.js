@@ -162,28 +162,26 @@ const BookConfirmation = ({route, navigation}) => {
         </div>
     </div>
         `
-        try {
-            const result = await http.post('sendBookingReceipt', {email : userInformation.email, html : htmlContent})
-        } catch (error) {
-            console.log(Error)
-        }
 
+        const result = await http.post('sendBookingReceipt', {email : userInformation.email, html : htmlContent})
         const receiver = service.owner._id
+        // console.log(finalBookingInformation)
         if(finalBookingInformation !== null)
         {   
             try {
                 const result = await http.post('addBooking', finalBookingInformation)
                 if(result.status === 200)
                 {
-                    notifyUser(result.data._id, receiver) //insert notification in the database
                     socket.emit('New_Notification', {notification : 'New_Booking', receiver : receiver}); //notify user theres a new booking
-                    axios.post(`https://app.nativenotify.com/api/indie/notification`, {
+                    await axios.post(`https://app.nativenotify.com/api/indie/notification`, {
                     subID: receiver,
                     appId: 19825,
                     appToken: 'bY9Ipmkm8sFKbmXf7T0zNN',
                     title: `New booking`,
                     message: 'You have a new booking'
                     });
+                    notifyUser(result.data._id, receiver) //insert notification in the database
+                    
                 }
             } catch (error) {
                 console.log(error)
@@ -194,6 +192,7 @@ const BookConfirmation = ({route, navigation}) => {
     }
 
     const notifyUser = async (booking_id, receiver) => {
+
         try {
             const notify = await http.post('addNotification', {
                 notification_type : "New_Booking", 
@@ -203,12 +202,13 @@ const BookConfirmation = ({route, navigation}) => {
                 notif_to : receiver,
                 reference_id : booking_id
             })
+            console.log(notify.data)
             setPaid(true)
             setLoadingGcashPayment(false)
             setShowPaymentModal(false)
             navigation.navigate("ClientBookings")
         } catch (error) {
-            console.error(error)
+            console.error(error.response)
         }
     }
 

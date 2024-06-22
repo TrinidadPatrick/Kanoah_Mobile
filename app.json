@@ -22,9 +22,9 @@
       }
     },
     "android": {
-      "config" : {
-        "googleMaps" : {
-          "apiKey" : "AIzaSyAVDyfYAh_unbWuN6Fq6q1BPJ1GkkihmRM"
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAVDyfYAh_unbWuN6Fq6q1BPJ1GkkihmRM"
         }
       },
       "adaptiveIcon": {
@@ -61,7 +61,8 @@
         {
           "isAndroidBackgroundLocationEnabled": "Allow $(PRODUCT_NAME) to use your location."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "updates": {
       "url": "https://u.expo.dev/36105a23-262d-4b13-9cc9-f0145ab91bb5"

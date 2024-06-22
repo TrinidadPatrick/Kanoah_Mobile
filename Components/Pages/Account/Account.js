@@ -87,7 +87,7 @@ const Account = ({navigation}) => {
           service === null?
           <View className="h-[250] flex-col items-center justify-center space-y-2">
             <Text className="font-medium text-gray-600">You are currently not registered to a service</Text>
-            <TouchableOpacity onPress={()=>{Linking.openURL('https://web-based-service-finder.vercel.app/serviceRegistration')}} className="bg-gray-50 px-3 py-2">
+            <TouchableOpacity onPress={()=>{Linking.openURL('https://kanoah-web.vercel.app//serviceRegistration')}} className="bg-gray-50 px-3 py-2">
               <Text>Add service</Text>
             </TouchableOpacity>
           </View>

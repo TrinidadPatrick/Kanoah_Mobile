@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native'
 import { useState, useEffect } from 'react';
 import phil from 'phil-reg-prov-mun-brgy';
 import { SelectList } from 'react-native-dropdown-select-list'
@@ -18,20 +18,22 @@ const AddressModal = ({route}) => {
     const [location, setLocation] = useState({
         longitude : userInformation.Address === null ? 120.8236601 : userInformation.Address?.longitude ,
         latitude : userInformation.Address === null ? 14.5964466 : userInformation.Address?.latitude
-      })
-      const [street, setStreet] = useState(userInformation.Address === null ? "" : userInformation.Address.street)
-      const [locCodesSelected, setLocCodesSelected] = useState([
+    })
+    const [street, setStreet] = useState(userInformation.Address === null ? "" : userInformation.Address.street)
+    const [locCodesSelected, setLocCodesSelected] = useState([
         ['', '-1'], //Region
         ['','-1'], //Province
         ['','-1'], //Municipality
         ['','-1'] //Barangay
-      ])
-      const [error, setError] = useState({
+    ])
+    const [error, setError] = useState({
         region : false,
         province : false,
         municipality : false,
         barangay : false,
-      })
+    })
+    const [placeInput, setPlaceInput] = useState('')
+    const [suggestedPlaces, setSuggestedPlaces] = useState([])
     
       const customMapStyle = [
         {
@@ -143,6 +145,31 @@ const AddressModal = ({route}) => {
             navigation.goBack()
 
           }
+      }
+
+      const handleAutoCompletePlace = async (value) => {
+        setPlaceInput(value)
+        if (value.length > 2) {
+          const response = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${value}.json`, {
+              params: {
+                  access_token: 'pk.eyJ1IjoicGF0cmljazAyMSIsImEiOiJjbG8ybWJhb2MwMmR4MnFyeWRjMWtuZDVwIn0.mJug0iHxD8aq8ZdT29B-fg',
+                  autocomplete: true,
+              }
+          });
+    
+          setSuggestedPlaces(response.data.features)
+      }
+      else
+      {
+        setSuggestedPlaces([])
+      }
+      }
+    
+      const handlePlaceSelect = async (place) => {
+        setLocation({latitude : place.center[1], longitude : place.center[0]})
+        setPlaceInput(place.place_name)
+        setSuggestedPlaces([])
+          
       }
 
       //Sets the initial value
@@ -302,20 +329,27 @@ const AddressModal = ({route}) => {
       />
       </MapView>
       <View className="absolute top-0 p-1 w-full">
-      <GooglePlacesAutocomplete
-      placeholder='Search'
-      onPress={(data, details = null) => {
-        setLocation({
-            longitude : details.geometry.location.lng,
-            latitude : details.geometry.location.lat
-        })
-      }}
-      fetchDetails
-      query={{
-        key: 'AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA',
-        language: 'en',
-      }}
-      />
+      {/* Auto Complete */}
+      <View className="h-[50px] bg-white overflow-visible z-30  relative">
+                <View className="h-[50px] bg-transparent border border-gray-200 rounded absolute flex items-center w-full   z-30">
+                <FontAwesome name="location-arrow" size={22} color="green" className="absolute z-10 top-3 left-3" />
+                {/* Search bar location */}
+                <TextInput value={placeInput} className=" w-full top-2 pl-10" placeholder="Input location" onChangeText={(value)=>handleAutoCompletePlace(value)} />
+
+                </View>
+                {
+                  suggestedPlaces?.length !== 0 &&
+                  <ScrollView className="w-full h-[250px] origin-top bg-white shadow p-3 absolute top-14">
+                 {
+                  suggestedPlaces.map((place, index)=>(
+                    <TouchableOpacity key={index} onPress={()=>handlePlaceSelect(place)} className="p-2">
+                      <Text>{place.place_name}</Text>
+                    </TouchableOpacity>
+                  ))
+                 }
+                </ScrollView>
+                }
+      </View>
       </View>
       <TouchableOpacity onPress={()=>navigation.navigate('MapFullScreen', {userInformation, submit : getCoordinatesFromFullScreenMap})} className="absolute bottom-2 right-2">
       <FontAwesome className={``} name="expand" size={22} color="gray" />

@@ -13,11 +13,13 @@ const Map = ({location, setLocation, setSelectedAddress, setAddress, selectedAdd
     const handleMarkerDragEnd = async (e) => {
         const { latitude, longitude } = e.nativeEvent.coordinate;
         setLocation({latitude, longitude})
-        const response = await axios.get(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=AIzaSyAGPyvnVRcJ5FDO88LP2LWWyTRnlRqNYYA`
-          );
-        setSelectedAddress(response.data.plus_code.compound_code)
-        console.log(response.data)
+          try {
+            const response = await axios.get(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${location.longitude}&latitude=${location.latitude}&access_token=pk.eyJ1IjoicGF0cmljazAyMSIsImEiOiJjbG8ybWJhb2MwMmR4MnFyeWRjMWtuZDVwIn0.mJug0iHxD8aq8ZdT29B-fg`)
+          setAddress(response.data.features[0].properties.full_address)
+          setSelectedAddress(response.data.features[0].properties.full_address)
+          } catch (error) {
+            console.log(error)
+          } 
     };
 
     const customMapStyle = [
@@ -51,8 +53,6 @@ const Map = ({location, setLocation, setSelectedAddress, setAddress, selectedAdd
         },
         // Add more styling rules as needed
     ];
-
-    // console.log(location)
 
 
   return (
